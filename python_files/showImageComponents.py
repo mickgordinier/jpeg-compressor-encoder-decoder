@@ -88,8 +88,23 @@ def show_chroma_components(img):
 
 
 def main():
-    img = Image.open("maggie.jpg").rotate(-90)
+    img = Image.open("test_img/test_0.bmp")
     img.show()
-    show_chroma_components(img)
     
+    a = np.array(img)
+    
+    red = a[:,:,0]
+    green = a[:,:,1]
+    blue = a[:,:,2]
+    
+    y = (0.299 * red) + (0.587 * green) + (0.114 * blue)
+    cb = (-0.1687 * red) + (-0.3313 * green) + (0.5 * blue) + 128
+    cr = (0.5 * red) + (-0.4187 * green) + (-0.0813 * blue) + 128
+    
+    print(red.astype(np.uint8))
+    print(green.astype(np.uint8))
+    print(blue.astype(np.uint8))
+    print(y.astype(np.uint8))
+    print(cb.astype(np.uint8))
+    print(cr.astype(np.uint8))
 main()
