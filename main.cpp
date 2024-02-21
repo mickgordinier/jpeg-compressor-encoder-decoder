@@ -46,7 +46,7 @@ void create_discrete_cosine_transform_matrix(std::vector<std::vector<double>> & 
     
     // entire first row is sqrt(1/N)
     // using double for more precise percision
-    double dct_val = std::sqrt(1/8);
+    double dct_val = std::sqrt(1.0/8.0);
     for (std::uint8_t col_idx = 0; col_idx < 8; ++col_idx) {
         dct[0][col_idx] = dct_val;
     }
@@ -55,6 +55,16 @@ void create_discrete_cosine_transform_matrix(std::vector<std::vector<double>> & 
     for (std::uint8_t row_idx = 1; row_idx < 8; ++row_idx) {
         for (std::uint8_t col_idx = 0; col_idx < 8; ++col_idx) {
             dct[row_idx][col_idx] = 0.5 * cos(((2*col_idx + 1) * row_idx * M_PI) / 16);
+        }
+    }
+}
+
+
+template <typename T>
+void transform(std::vector<std::vector<T>> & original, std::vector<std::vector<T>> & transformed) {
+    for (uint32_t orig_row_idx = 0; orig_row_idx < original.size(); ++orig_row_idx) {
+        for (uint32_t orig_col_idx = 0; orig_col_idx < original[0].size(); ++orig_col_idx) {
+            transformed[orig_col_idx][orig_row_idx] = original[orig_row_idx][orig_col_idx];
         }
     }
 }
@@ -108,6 +118,47 @@ void pad_YCbCr(std::vector< std::vector< std::array<uint8_t, 3>>> & yCbCr, uint3
 }
 
 
+void apply_dct_transform(std::vector< std::vector< std::array<double, 3>>> & img_dct, std::vector< std::vector< std::array<uint8_t, 3>>> & yCbCr, 
+                            std::vector<std::vector<double>> & dct, std::vector<std::vector<double>> & dct_t) {
+    
+    // img_dct = dct * yCbCr * dct_t
+
+    // 1a. recenter yCbCr image to 0 (subtract each value by 128)
+    // 1b. img_dct = dct * yCbCr
+    for (uint32_t row_idx = 0; row_idx < 8; ++row_idx) {
+        for (uint32_t col_idx = 0; col_idx < 8; ++col_idx) {
+            for (uint8_t color_layer_idx = 0; color_layer_idx < 3; ++ color_layer_idx) {
+                double sum = 0.0;
+                for (uint32_t index = 0; index < 8; ++index) {
+                    sum += dct[row_idx][index] * (yCbCr[index][col_idx][color_layer_idx]-128);
+                }
+                img_dct[row_idx][col_idx][color_layer_idx] = sum;
+            }
+        }
+    }
+
+    // 2. img_dct = img_dct * dct_t
+    for (uint32_t row_idx = 0; row_idx < 8; ++row_idx) {
+        for (uint32_t col_idx = 0; col_idx < 8; ++col_idx) {
+            for (uint8_t color_layer_idx = 0; color_layer_idx < 3; ++ color_layer_idx) {
+                double sum = 0.0;
+                for (uint32_t index = 0; index < 8; ++index) {
+                    sum += img_dct[row_idx][index][color_layer_idx] * dct_t[index][col_idx];
+                }
+                img_dct[row_idx][col_idx][color_layer_idx] = sum;
+            }
+        }
+    }
+
+    for (uint32_t row_idx = 0; row_idx < 8; ++row_idx) {
+        for (uint32_t col_idx = 0; col_idx < 8; ++col_idx) {
+            std::cout << img_dct[row_idx][col_idx][0] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+
 int main(int argc, char* argv[]) 
 {
     if (argc != 2) {
@@ -157,8 +208,28 @@ int main(int argc, char* argv[])
     std::cout << "Padded YCbCr Matrix" << std::endl;
     print_image_matrix(yCbCr_img_matrix, std::cout);
 
+
     // Step 3: Downsampling Chroma Components TBD
 
 
-    // Step 4: DCT
+    // Step 4: Discrete Cosine Transform (DCT)
+    // Transforming 8x8 image blocks from spacial domain --> frequency domain
+    std::vector<std::vector<double>> dct;
+    dct.resize(8, std::vector<double>(8));
+    create_discrete_cosine_transform_matrix(dct);
+
+    std::vector<std::vector<double>> transformed_dct;
+    transformed_dct.resize(8, std::vector<double>(8));
+    transform(dct, transformed_dct);
+
+    std::vector< std::vector< std::array<double, 3>>> dct_applied_matrix;
+    dct_applied_matrix.resize(yCbCr_height);
+    for (uint32_t row_idx = 0; row_idx < yCbCr_height; ++row_idx) {
+        dct_applied_matrix[row_idx].resize(yCbCr_width);
+    }
+
+    apply_dct_transform(dct_applied_matrix, yCbCr_img_matrix, dct, transformed_dct);
+
+    std::cout << "Hello" << std::endl;
+
 }

@@ -89,3 +89,42 @@ void BitmapDecoder::createRgbMatrix(std::ifstream& bmp_file) {
         skipBytes(bmp_file, num_padding_bytes);
     }
 }
+
+
+// Prints similar to format as numpy matrix on python
+void BitmapDecoder::printRgbMatrix() {
+
+    for (uint8_t color_layer = 0; color_layer < 3; ++color_layer) {
+        std::cout << "[";
+        for (uint32_t row_idx = 0; row_idx < rgb_img_matrix.size(); ++row_idx) {
+            if (row_idx != 0) {
+                std::cout << " ";
+            }
+
+            std::cout << "[";
+
+            for (uint32_t col_idx = 0; col_idx < rgb_img_matrix[0].size(); ++col_idx) {
+                uint8_t value = unsigned(rgb_img_matrix[row_idx][col_idx][color_layer]);
+
+                uint8_t numspaces = (value / 100 <= 0) + (value / 10 <= 0);
+                for (uint8_t i = 0; i < numspaces; ++i) {
+                    std::cout << " ";
+                }
+
+                std::cout << unsigned(value);
+
+                if (col_idx < rgb_img_matrix[0].size()-1) {
+                    std::cout << ", ";
+                }
+            }
+            std::cout << "]";
+
+            if (row_idx < rgb_img_matrix.size()-1) {
+                std::cout << "," << std::endl;
+            }
+        }
+
+        std::cout << "]" << std::endl << std::endl;
+    }
+    std::cout << std::endl;
+}

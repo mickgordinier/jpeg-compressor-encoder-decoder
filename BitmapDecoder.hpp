@@ -12,6 +12,7 @@ class BitmapDecoder {
     
     public:
         BitmapDecoder(std::string filename);
+        void printRgbMatrix();
         
         std::vector< std::vector< std::array<uint8_t, 3>>> rgb_img_matrix;
         uint32_t height;

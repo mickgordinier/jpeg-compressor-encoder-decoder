@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/prog",
-            "args": ["test_img/test_10.bmp"],
+            "args": ["test_1.bmp"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
