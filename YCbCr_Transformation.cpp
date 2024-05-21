@@ -17,6 +17,7 @@
     After subtracting the Y, Cb, and Cb channels from the image, the remainder provides the chroma green information. This can be mathematically extracted instead of encoded, saving bandwidth.
 */
 YCbCr_Img_Matrix convert_RGB_to_padded_YCbCr(const RGB_Img_Matrix & rgb_matrix) {
+    
     YCbCr_Img_Matrix yCbCr_matrix;
 
     // NEED HEIGHT AND WIDTH TO BE MULTIPLE OF 8 TO PROPERLY PERFORM DCT
@@ -51,9 +52,9 @@ YCbCr_Img_Matrix convert_RGB_to_padded_YCbCr(const RGB_Img_Matrix & rgb_matrix) 
         RGB to YCbCr Conversion
         YCbCr (256 levels) can be computed directly from 8-bit RGB as follows:
 
-        Y = 0.299 R + 0.587 G + 0.114 B
-        Cb = - 0.1687 R - 0.3313 G + 0.5 B + 128
-        Cr = 0.5 R - 0.4187 G - 0.0813 B + 128
+        Y  =  (0.299   * R) + (0.587  * G) + (0.114  * B)
+        Cb =  (-0.1687 * R) - (0.3313 * G) + (0.5    * B) + 128
+        Cr =  (0.5     * R) - (0.4187 * G) - (0.0813 * B) + 128
     */
 
     for (uint32_t row_idx = 0; row_idx < rgb_matrix.size(); ++row_idx) {
@@ -61,17 +62,16 @@ YCbCr_Img_Matrix convert_RGB_to_padded_YCbCr(const RGB_Img_Matrix & rgb_matrix) 
             
             RGB_Val rgb_val = rgb_matrix[row_idx][col_idx];
 
-            // Notice: Information will be lost as it will round down to integer
             YCbCr_Val yCbCr_val;
             
             // luminance (Y) channel
-            yCbCr_val.y = (rgb_val[0] * 0.299) + (rgb_val[1] * 0.587) + (rgb_val[2] * 0.114);
+            yCbCr_val.y = (static_cast<double>(rgb_val.r) * 0.299)    + (static_cast<double>(rgb_val.g) * 0.587)   + (static_cast<double>(rgb_val.b) * 0.114);
             
             // chroma blue (Cb) channel
-            yCbCr_val.cb = (rgb_val[0] * -0.1687) + (rgb_val[1] * -0.331) + (rgb_val[2] * 0.5) + 128;
+            yCbCr_val.cb = (static_cast<double>(rgb_val.r) * -0.1687) + (static_cast<double>(rgb_val.g) * -0.331)  + (static_cast<double>(rgb_val.b) * 0.5)     + 128;
             
             // chroma red (Cr) channel
-            yCbCr_val.cr = (rgb_val[0] * 0.5) + (rgb_val[1] * -0.4187) + (rgb_val[2] * -0.0813) + 128;
+            yCbCr_val.cr = (static_cast<double>(rgb_val.r) * 0.5)     + (static_cast<double>(rgb_val.g) * -0.4187) + (static_cast<double>(rgb_val.b) * -0.0813) + 128;
 
             yCbCr_matrix[row_idx][col_idx] = yCbCr_val;
         }
@@ -115,24 +115,22 @@ void pad_YCbCr(YCbCr_Img_Matrix & yCbCr, uint32_t original_height, uint32_t orig
     */
 
     // Pad same pixels through the padded columns
-    for (uint32_t col_idx = original_width; col_idx < yCbCr[0].size(); ++col_idx) {
-        for (uint32_t row_idx = 0; row_idx < original_height; ++row_idx) {
-            YCbCr_Val value_to_copy = yCbCr[row_idx][original_width-1];
+    for (uint32_t row_idx = 0; row_idx < original_height; ++row_idx) {
 
-            yCbCr[row_idx][col_idx][0] = value_to_copy[0];
-            yCbCr[row_idx][col_idx][1] = value_to_copy[1];
-            yCbCr[row_idx][col_idx][2] = value_to_copy[2];
+        YCbCr_Val value_to_copy = yCbCr[row_idx][original_width-1];
+
+        for (uint32_t col_idx = original_width; col_idx < yCbCr[0].size(); ++col_idx) {
+            yCbCr[row_idx][col_idx] = value_to_copy;
         }
     }
 
     // Pad same pixels through the padded rows
-    for (uint32_t row_idx = original_height; row_idx < yCbCr.size(); ++row_idx) {
-        for (uint32_t col_idx = 0; col_idx < original_width; ++col_idx) {
-            YCbCr_Val value_to_copy = yCbCr[original_height-1][col_idx];
+    for (uint32_t col_idx = 0; col_idx < original_width; ++col_idx) {
 
-            yCbCr[row_idx][col_idx][0] = value_to_copy[0];
-            yCbCr[row_idx][col_idx][1] = value_to_copy[1];
-            yCbCr[row_idx][col_idx][2] = value_to_copy[2];
+        YCbCr_Val value_to_copy = yCbCr[original_height-1][col_idx];
+
+        for (uint32_t row_idx = original_height; row_idx < yCbCr.size(); ++row_idx) {
+            yCbCr[row_idx][col_idx] = value_to_copy;
         }
     }
 
@@ -141,9 +139,7 @@ void pad_YCbCr(YCbCr_Img_Matrix & yCbCr, uint32_t original_height, uint32_t orig
 
     for (uint32_t row_idx = original_height; row_idx < yCbCr.size(); ++row_idx) {
         for (uint32_t col_idx = original_width; col_idx < yCbCr[0].size(); ++col_idx) {
-            yCbCr[row_idx][col_idx][0] = value_to_copy[0];
-            yCbCr[row_idx][col_idx][1] = value_to_copy[1];
-            yCbCr[row_idx][col_idx][2] = value_to_copy[2];
+            yCbCr[row_idx][col_idx] = value_to_copy;
         }
     }
 }
