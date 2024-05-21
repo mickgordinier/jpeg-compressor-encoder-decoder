@@ -1,5 +1,5 @@
-#ifndef COMMON_TYPES_HPP
-#define COMMON_TYPES_HPP
+#ifndef COMMON_TYPES_H
+#define COMMON_TYPES_H
 
 #include <vector>
 #include <cstdint>
@@ -15,4 +15,4 @@ struct YCbCr_Val {
 typedef std::vector<std::vector<RGB_Val>> RGB_Img_Matrix;
 typedef std::vector<std::vector<YCbCr_Val>> YCbCr_Img_Matrix;
 
-#endif // COMMON_TYPES_HPP
+#endif // COMMON_TYPES_H

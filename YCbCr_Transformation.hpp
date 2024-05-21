@@ -1,5 +1,5 @@
-#ifndef YCBCR_TRANSFORMATION_HPP
-#define YCBCR_TRANSFORMATION_HPP
+#ifndef YCBCR_TRANSFORMATION_H
+#define YCBCR_TRANSFORMATION_H
 
 #include "CommonTypes.hpp"
 #include <vector>
