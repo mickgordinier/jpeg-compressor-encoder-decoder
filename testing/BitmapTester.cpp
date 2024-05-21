@@ -34,14 +34,15 @@ void runBitmapDecoderTest(std::string bmp_file_name) {
 
     std::cout << "Comparing Image Matrix" << std::endl;
 
-    uint32_t color_val;
+    uint32_t color_val_r, color_val_g, color_val_b;
 
     for (uint32_t row_idx = 0; row_idx < correct_height; ++row_idx) {
         for (uint32_t col_idx = 0; col_idx < correct_width; ++col_idx) {
-            for (uint8_t color_idx = 0; color_idx < 3; ++color_idx) {
-                correct_value_file >> color_val;
-                assert(bit_test.rgb_img_matrix[row_idx][col_idx][color_idx] == color_val);
-            }
+            correct_value_file >> color_val_r >> color_val_g >> color_val_b;
+
+            assert(bit_test.rgb_img_matrix[row_idx][col_idx].r == color_val_r);
+            assert(bit_test.rgb_img_matrix[row_idx][col_idx].g == color_val_g);
+            assert(bit_test.rgb_img_matrix[row_idx][col_idx].b == color_val_b);
         }
     }
     std::cout << "Image Matrix Correct!" << std::endl;

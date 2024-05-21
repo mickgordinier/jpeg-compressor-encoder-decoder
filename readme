@@ -1,0 +1,3 @@
+To run the Bitmap Decoder Tests run:
+make bitmap_tests
+

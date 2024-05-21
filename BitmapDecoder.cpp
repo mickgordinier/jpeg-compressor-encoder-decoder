@@ -7,9 +7,6 @@
 #include <array>
 #include <cstdint>
 
-typedef std::array<uint8_t, 3> RGB_Val;                  // Can be uint_8 as values range from 0-255
-typedef std::vector<std::vector<RGB_Val>> RGB_Img_Matrix;
-
 BitmapDecoder::BitmapDecoder(std::string filename) {
     
     // opening up bmp img bytes to read
@@ -87,11 +84,13 @@ void BitmapDecoder::createRgbMatrix(std::ifstream& bmp_file) {
         for (std::uint32_t col_idx = 0; col_idx < width; ++col_idx) {
 
             // 0 = red, 1 = green, 2 = blue
-            for (std::uint8_t color_layer_idx = 3; color_layer_idx > 0; --color_layer_idx) {
-                file_byte = bmp_file.get();
+            RGB_Val rgb_val;
 
-                rgb_img_matrix[row_idx-1][col_idx][color_layer_idx-1] = file_byte;
-            }
+            rgb_val.b = bmp_file.get();
+            rgb_val.g = bmp_file.get();
+            rgb_val.r = bmp_file.get();
+            
+            rgb_img_matrix[row_idx-1][col_idx] = rgb_val;
         }
 
         // accounting for padding bytes in file
@@ -113,8 +112,17 @@ void BitmapDecoder::printRgbMatrix() {
             std::cout << "[";
 
             for (uint32_t col_idx = 0; col_idx < rgb_img_matrix[0].size(); ++col_idx) {
-                uint8_t value = unsigned(rgb_img_matrix[row_idx][col_idx][color_layer]);
+                
+                uint8_t value;
 
+                if (color_layer == 0) {
+                    value = unsigned(rgb_img_matrix[row_idx][col_idx].r);
+                } else if (color_layer == 1) {
+                    value = unsigned(rgb_img_matrix[row_idx][col_idx].g);
+                } else {
+                    value = unsigned(rgb_img_matrix[row_idx][col_idx].b);
+                }
+                
                 uint8_t numspaces = (value / 100 <= 0) + (value / 10 <= 0);
                 for (uint8_t i = 0; i < numspaces; ++i) {
                     std::cout << " ";

@@ -65,13 +65,13 @@ YCbCr_Img_Matrix convert_RGB_to_padded_YCbCr(const RGB_Img_Matrix & rgb_matrix) 
             YCbCr_Val yCbCr_val;
             
             // luminance (Y) channel
-            yCbCr_val[0] = (rgb_val[0] * 0.299) + (rgb_val[1] * 0.587) + (rgb_val[2] * 0.114);
+            yCbCr_val.y = (rgb_val[0] * 0.299) + (rgb_val[1] * 0.587) + (rgb_val[2] * 0.114);
             
             // chroma blue (Cb) channel
-            yCbCr_val[1] = (rgb_val[0] * -0.1687) + (rgb_val[1] * -0.331) + (rgb_val[2] * 0.5) + 128;
+            yCbCr_val.cb = (rgb_val[0] * -0.1687) + (rgb_val[1] * -0.331) + (rgb_val[2] * 0.5) + 128;
             
             // chroma red (Cr) channel
-            yCbCr_val[2] = (rgb_val[0] * 0.5) + (rgb_val[1] * -0.4187) + (rgb_val[2] * -0.0813) + 128;
+            yCbCr_val.cr = (rgb_val[0] * 0.5) + (rgb_val[1] * -0.4187) + (rgb_val[2] * -0.0813) + 128;
 
             yCbCr_matrix[row_idx][col_idx] = yCbCr_val;
         }
