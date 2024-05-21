@@ -1,5 +1,7 @@
 #include <vector>
 #include <cmath>
+#include <array>
+#include <cstdint>
 
 typedef std::array<int16_t, 3> YCbCr_Val;               // Needs to be int16_t as values will be shifted down 128 in DCT
 typedef std::vector<std::vector<YCbCr_Val>> YCbCr_Img_Matrix;

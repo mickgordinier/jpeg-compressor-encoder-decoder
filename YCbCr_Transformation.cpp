@@ -1,11 +1,4 @@
-#include <vector>
-
-typedef std::array<uint8_t, 3> RGB_Val;                  // Can be uint_8 as values range from 0-255
-typedef std::vector<std::vector<RGB_Val>> RGB_Img_Matrix;
-
-typedef std::array<int16_t, 3> YCbCr_Val;               // Needs to be int16_t as values will be shifted down 128 in DCT
-typedef std::vector<std::vector<RGB_Val>> YCbCr_Img_Matrix;
-
+#include "YCbCr_Transformation.hpp"
 
 // Converting RGB image to YCbCr Image. Also padding image to make dimesions multiple of 8.
 /*
@@ -23,8 +16,8 @@ typedef std::vector<std::vector<RGB_Val>> YCbCr_Img_Matrix;
     Chroma Red (Cr) - The Chroma Red Channel is the RGB blue channel minus the luminance.
     After subtracting the Y, Cb, and Cb channels from the image, the remainder provides the chroma green information. This can be mathematically extracted instead of encoded, saving bandwidth.
 */
-Img_Matrix convert_RGB_to_padded_YCbCr(const Img_Matrix & rgb_matrix) {
-    Img_Matrix yCbCr_matrix;
+YCbCr_Img_Matrix convert_RGB_to_padded_YCbCr(const RGB_Img_Matrix & rgb_matrix) {
+    YCbCr_Img_Matrix yCbCr_matrix;
 
     // NEED HEIGHT AND WIDTH TO BE MULTIPLE OF 8 TO PROPERLY PERFORM DCT
     // WILL IGNORE PADDED PIXELS AFTERWARDS
@@ -90,7 +83,7 @@ Img_Matrix convert_RGB_to_padded_YCbCr(const Img_Matrix & rgb_matrix) {
 }
 
 // Padding with repeated pixels technique to make image size multiple of 8
-void pad_YCbCr(Img_Matrix & yCbCr, uint32_t original_height, uint32_t original_width) {
+void pad_YCbCr(YCbCr_Img_Matrix & yCbCr, uint32_t original_height, uint32_t original_width) {
 
     /*
     Source: https://www.thewebmaster.com/jpeg-definitive-guide/

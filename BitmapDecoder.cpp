@@ -1,5 +1,14 @@
 #include "BitmapDecoder.hpp"
 
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <array>
+#include <cstdint>
+
+typedef std::array<uint8_t, 3> RGB_Val;                  // Can be uint_8 as values range from 0-255
+typedef std::vector<std::vector<RGB_Val>> RGB_Img_Matrix;
 
 BitmapDecoder::BitmapDecoder(std::string filename) {
     

@@ -1,6 +1,4 @@
 #include "BitmapDecoder.hpp"
-#include "YCbCr_Transformation.cpp"
-#include "Discrete_Cosine_Transformaion.cpp"
 #include <cmath>
 #include <vector>
 #include <array>

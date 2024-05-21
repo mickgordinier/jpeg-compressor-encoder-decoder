@@ -1,8 +1,9 @@
+#ifndef BITMAPDECODER_H
+#define BITMAPDECODER_H
+
 #include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
 #include <array>
+#include <vector>
 
 class BitmapDecoder {
     private:
@@ -18,3 +19,5 @@ class BitmapDecoder {
         uint32_t height;
         uint32_t width;
 };
+
+#endif //BITMAPDECODER_H
