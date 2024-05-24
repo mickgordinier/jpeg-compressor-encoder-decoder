@@ -1,4 +1,4 @@
-#include "../BitmapDecoder.hpp"
+#include "../../BitmapDecoder.hpp"
 #include <iostream>
 #include <fstream>
 #include <cassert>

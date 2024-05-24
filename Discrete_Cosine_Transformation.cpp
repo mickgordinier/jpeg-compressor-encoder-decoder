@@ -4,6 +4,7 @@
 #include <cmath>
 #include <array>
 #include <cstdint>
+#include <iostream>
 
 /*
 Source: https://www.math.cuhk.edu.hk/~lmlui/dct.pdf
@@ -37,6 +38,13 @@ std::vector<std::vector<double>> create_discrete_cosine_transform_matrix() {
         for (uint8_t col_idx = 0; col_idx < 8; ++col_idx) {
             dct_matrix[row_idx][col_idx] = 0.5 * cos(((2*col_idx + 1) * row_idx * M_PI) / 16);
         }
+    }
+
+    for (int row_idx = 0; row_idx < 8; ++row_idx) {
+        for (int col_idx = 0; col_idx < 8; ++col_idx) {
+            std::cout << dct_matrix[row_idx][col_idx] << " ";
+        }
+        std::cout << std::endl;
     }
 
     return dct_matrix;
@@ -90,6 +98,8 @@ void transform_DCT_8_by_8_block(YCbCr_Img_Matrix & image_to_transform,
 // Before computing the DCT of each 8x8 block, each value in the matrix must be recentered around zero. I.e., the midpoint must be 0.
 void perform_DCT_operation(YCbCr_Img_Matrix & image_to_transform) {
 
+    std::vector<std::vector<double>> dct_matrix = create_discrete_cosine_transform_matrix();
+    
     // Need values of YCbCr Image to go from 0-255 --> -128-127 (Subtract 128 to each element)
     for (int row_idx = 0; row_idx < image_to_transform.size(); ++row_idx) {
         for (int col_idx = 0; col_idx < image_to_transform[0].size(); ++col_idx) {
@@ -99,7 +109,6 @@ void perform_DCT_operation(YCbCr_Img_Matrix & image_to_transform) {
         }
     }
     
-    std::vector<std::vector<double>> dct_matrix = create_discrete_cosine_transform_matrix();
 
     for (int img_row_idx = 0; img_row_idx < image_to_transform.size(); img_row_idx+=8) {
         for (int img_col_idx = 0; img_col_idx < image_to_transform[0].size(); img_col_idx+=8) {
