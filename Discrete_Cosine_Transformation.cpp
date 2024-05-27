@@ -40,13 +40,6 @@ std::vector<std::vector<double>> create_discrete_cosine_transform_matrix() {
         }
     }
 
-    for (int row_idx = 0; row_idx < 8; ++row_idx) {
-        for (int col_idx = 0; col_idx < 8; ++col_idx) {
-            std::cout << dct_matrix[row_idx][col_idx] << " ";
-        }
-        std::cout << std::endl;
-    }
-
     return dct_matrix;
 }
 
@@ -64,9 +57,9 @@ void transform_DCT_8_by_8_block(YCbCr_Img_Matrix & image_to_transform,
             YCbCr_Val mat_mul_YCbCr;
 
             for (int i = 0; i < 8; ++i) {
-                mat_mul_YCbCr.y  += (dct_matrix[img_row_idx+row][img_col_idx+col+i] * image_to_transform[img_row_idx+row+i][img_col_idx+col].y);
-                mat_mul_YCbCr.cb += (dct_matrix[img_row_idx+row][img_col_idx+col+i] * image_to_transform[img_row_idx+row+i][img_col_idx+col].cb);
-                mat_mul_YCbCr.cr += (dct_matrix[img_row_idx+row][img_col_idx+col+i] * image_to_transform[img_row_idx+row+i][img_col_idx+col].cr);
+                mat_mul_YCbCr.y  += (dct_matrix[img_row_idx+row][img_col_idx+i] * image_to_transform[img_row_idx+i][img_col_idx+col].y);
+                mat_mul_YCbCr.cb += (dct_matrix[img_row_idx+row][img_col_idx+i] * image_to_transform[img_row_idx+i][img_col_idx+col].cb);
+                mat_mul_YCbCr.cr += (dct_matrix[img_row_idx+row][img_col_idx+i] * image_to_transform[img_row_idx+i][img_col_idx+col].cr);
             }
 
             image_to_transform[img_row_idx+row][img_col_idx+col] = mat_mul_YCbCr;

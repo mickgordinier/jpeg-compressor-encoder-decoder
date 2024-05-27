@@ -11,8 +11,8 @@
 IMAGE DESCRIPTIONS IN test_img_description.txt!
 */
 
-const std::string BASE_IMAGE_FOLDER = "testing/bitmap_test_imgs/";
-const std::string BASE_CORRECT_FOLDER = "testing/correct_image_values/";
+const std::string BASE_IMAGE_FOLDER = "testing/bitmap_testing/bitmap_test_imgs/";
+const std::string BASE_CORRECT_FOLDER = "testing/bitmap_testing/correct_image_values/";
 
 // running comparisons on all features of BitmapDecoder
 void runBitmapDecoderTest(std::string bmp_file_name) {
