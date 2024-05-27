@@ -1,14 +1,8 @@
+#include "CommonTypes.hpp"
 #include "BitmapDecoder.hpp"
-#include <cmath>
-#include <vector>
-#include <array>
-
-typedef std::array<uint8_t, 3> RGB_Val;                  // Can be uint_8 as values range from 0-255
-typedef std::vector<std::vector<RGB_Val>> RGB_Img_Matrix;
-
-typedef std::array<int16_t, 3> YCbCr_Val;               // Needs to be int16_t as values will be shifted down 128 in DCT
-typedef std::vector<std::vector<RGB_Val>> YCbCr_Img_Matrix;
-
+#include "Discrete_Cosine_Transformation.hpp"
+#include "YCbCr_Transformation.hpp"
+#include "Quantization.hpp"
 
 // Prints similar to format as numpy matrix on python
 void print_image_matrix(RGB_Image_Matrix & image_matrix, std::ostream& stream) {
