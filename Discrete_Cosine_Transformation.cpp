@@ -47,22 +47,29 @@ std::vector<std::vector<double>> create_discrete_cosine_transform_matrix() {
 // DCT Transformation = (DCT Matrix) * (Original Image) * (DCT Matrix Transformed)
 void transform_DCT_8_by_8_block(YCbCr_Img_Matrix & image_to_transform, 
                                 const std::vector<std::vector<double>> & dct_matrix, 
-                                int img_row_idx, int img_col_idx) 
+                                int img_row_idx, int img_col_idx)
 {
+
+    // Need matrix to hold intermediate values
+    YCbCr_Img_Matrix temp_matrix;
+    temp_matrix.resize(8);
+    for (int i = 0; i < 8; ++i) {
+        temp_matrix[i].resize(8);
+    }
     
     // 1. Make transformed_image = dct_matrix * Original Image (F)
     for (int row = 0; row < 8; ++row) {
         for (int col = 0; col < 8; ++col) {
 
-            YCbCr_Val mat_mul_YCbCr;
+            YCbCr_Val sum_YCbCr = {0, 0, 0};
 
             for (int i = 0; i < 8; ++i) {
-                mat_mul_YCbCr.y  += (dct_matrix[img_row_idx+row][img_col_idx+i] * image_to_transform[img_row_idx+i][img_col_idx+col].y);
-                mat_mul_YCbCr.cb += (dct_matrix[img_row_idx+row][img_col_idx+i] * image_to_transform[img_row_idx+i][img_col_idx+col].cb);
-                mat_mul_YCbCr.cr += (dct_matrix[img_row_idx+row][img_col_idx+i] * image_to_transform[img_row_idx+i][img_col_idx+col].cr);
+                sum_YCbCr.y  += (dct_matrix[row][i] * image_to_transform[img_row_idx+i][img_col_idx+col].y);
+                sum_YCbCr.cb += (dct_matrix[row][i] * image_to_transform[img_row_idx+i][img_col_idx+col].cb);
+                sum_YCbCr.cr += (dct_matrix[row][i] * image_to_transform[img_row_idx+i][img_col_idx+col].cr);
             }
 
-            image_to_transform[img_row_idx+row][img_col_idx+col] = mat_mul_YCbCr;
+            temp_matrix[img_row_idx+row][img_col_idx+col] = sum_YCbCr;
         }
     }
 
@@ -70,19 +77,18 @@ void transform_DCT_8_by_8_block(YCbCr_Img_Matrix & image_to_transform,
     for (int row = 0; row < 8; ++row) {
         for (int col = 0; col < 8; ++col) {
             
-            YCbCr_Val mat_mul_YCbCr;
+            YCbCr_Val sum_YCbCr = {0, 0, 0};
 
             for (int i = 0; i < 8; ++i) {
                 // Transposing image DCT_Matrix_Transpose[i][j] = DCT_Matrix[j][i]
-                mat_mul_YCbCr.y  += (image_to_transform[img_row_idx+row][img_col_idx+col+i].y * dct_matrix[img_col_idx+col][img_row_idx+row+i]);
-                mat_mul_YCbCr.cb += (image_to_transform[img_row_idx+row][img_col_idx+col+i].cb * dct_matrix[img_col_idx+col][img_row_idx+row+i]);
-                mat_mul_YCbCr.cr += (image_to_transform[img_row_idx+row][img_col_idx+col+i].cr * dct_matrix[img_col_idx+col][img_row_idx+row+i]);
+                sum_YCbCr.y  += (temp_matrix[img_row_idx+row][img_col_idx+i].y * dct_matrix[col][i]);
+                sum_YCbCr.cb += (temp_matrix[img_row_idx+row][img_col_idx+i].cb * dct_matrix[col][i]);
+                sum_YCbCr.cr += (temp_matrix[img_row_idx+row][img_col_idx+i].cr * dct_matrix[col][i]);
             }
 
-            image_to_transform[img_row_idx+row][img_col_idx+col] = mat_mul_YCbCr;
+            image_to_transform[img_row_idx+row][img_col_idx+col] = sum_YCbCr;
         }
     }
-
 }
 
 

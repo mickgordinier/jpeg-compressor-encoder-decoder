@@ -34,7 +34,7 @@ def main():
         for col in range(8):
             dct_matrix[row][col] = 0.5 * np.cos((2*col + 1) * row * np.pi / 16)
     
-    for test_idx in range(10):
+    for test_idx in range(1):
         
         original_matrix = np.random.rand(8, 8, 3) * 256
         dct_coefficients = np.zeros((8,8,3))

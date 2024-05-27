@@ -12,7 +12,7 @@
 const std::string BASE_MATRIX_FOLDER = "testing/dct_testing/dct_test_imgs/";
 const std::string BASE_CORRECT_FOLDER = "testing/dct_testing/correct_image_values/";
 
-void run_dct_test(int test_idx, const std::vector<std::vector<double>> & dct_matrix) {
+void run_dct_test(int test_idx) {
 
     std::cout << "Testing Matrix " << test_idx << std::endl;
 
@@ -22,7 +22,7 @@ void run_dct_test(int test_idx, const std::vector<std::vector<double>> & dct_mat
     YCbCr_Img_Matrix matrix_to_test;
 
     matrix_to_test.resize(8);
-    
+
     for (int i = 0; i < 8; ++i) {
         matrix_to_test[i].resize(8);
     }
@@ -41,7 +41,7 @@ void run_dct_test(int test_idx, const std::vector<std::vector<double>> & dct_mat
     }
 
     // performs inplace DCT operation
-    transform_DCT_8_by_8_block(matrix_to_test, dct_matrix, 0, 0);
+    perform_DCT_operation(matrix_to_test);
     
     // comparing to true correct matrix output
     std::ifstream correct_matrix_file(BASE_CORRECT_FOLDER + "test_" + std::to_string(test_idx) + "_correct.txt");
@@ -64,10 +64,9 @@ void run_dct_test(int test_idx, const std::vector<std::vector<double>> & dct_mat
 }
 
 int main(int argc, char ** argv) {
-    std::vector<std::vector<double>> dct_matrix = create_discrete_cosine_transform_matrix();
 
-    for (int test_idx = 0; test_idx <= 10; ++test_idx) {
-        run_dct_test(test_idx, dct_matrix);
+    for (int test_idx = 0; test_idx < 10; ++test_idx) {
+        run_dct_test(test_idx);
     }
     
     std::cout << "@@@ ALL TEST PASSED :)" << std::endl << std::endl;
