@@ -1,0 +1,4 @@
+[1] https://www.opennet.ru/docs/formats/jpeg.txt
+[2] https://www.w3.org/Graphics/JPEG/itu-t81.pdf
+[3] https://koushtav.me/jpeg/tutorial/2017/11/25/lets-write-a-simple-jpeg-library-part-1/#step-6-entropy-coding
+[4] https://www.thewebmaster.com/jpeg-definitive-guide/#jpeg-encoding-entropy-coding

@@ -4,6 +4,7 @@
 #include <vector>
 #include <cstdint>
 
+// RGB are 8-bit unsigned values when read
 struct RGB_Val {
     uint8_t r, g, b;
 };

@@ -64,11 +64,11 @@ YCbCr_Img_Matrix convert_RGB_to_padded_YCbCr(const RGB_Img_Matrix & rgb_matrix) 
 
             YCbCr_Val yCbCr_val;
             
-            // luminance (Y) channel
+            // luminance (Y) channel (AKA Intensity of RGB Color)
             yCbCr_val.y = (static_cast<double>(rgb_val.r) * 0.299)    + (static_cast<double>(rgb_val.g) * 0.587)   + (static_cast<double>(rgb_val.b) * 0.114);
             
             // chroma blue (Cb) channel
-            yCbCr_val.cb = (static_cast<double>(rgb_val.r) * -0.1687) + (static_cast<double>(rgb_val.g) * -0.331)  + (static_cast<double>(rgb_val.b) * 0.5)     + 128;
+            yCbCr_val.cb = (static_cast<double>(rgb_val.r) * -0.1687) + (static_cast<double>(rgb_val.g) * -0.3313)  + (static_cast<double>(rgb_val.b) * 0.5)     + 128;
             
             // chroma red (Cr) channel
             yCbCr_val.cr = (static_cast<double>(rgb_val.r) * 0.5)     + (static_cast<double>(rgb_val.g) * -0.4187) + (static_cast<double>(rgb_val.b) * -0.0813) + 128;

@@ -5,6 +5,7 @@
 #include "Quantization.hpp"
 
 // Prints similar to format as numpy matrix on python
+/*
 void print_image_matrix(RGB_Image_Matrix & image_matrix, std::ostream& stream) {
 
     for (uint8_t color_layer = 0; color_layer < 3; ++color_layer) {
@@ -41,6 +42,7 @@ void print_image_matrix(RGB_Image_Matrix & image_matrix, std::ostream& stream) {
     }
     stream << std::endl;
 }
+*/
 
 
 int main(int argc, char* argv[]) 
@@ -57,8 +59,7 @@ int main(int argc, char* argv[])
     // Step 2: Convert RGB matrix to yCbCr Matrix to extract luminance channel from chroma/color channels
     // Padding image size to multiple of 8 to have correct MCU size needed for DCT
     // Padded pixels will be ignored afterwards
-    YCbCr_Img_Matrix yCbCr_img_matrix = convert_RGB_to_padded_YCbCr(bitmap.rgb_img_matrix);
-
+    YCbCr_Img_Matrix converted_image = convert_RGB_to_padded_YCbCr(bitmap.rgb_img_matrix);
 
     // Step 3: Downsampling Chroma Components TBD
 
@@ -66,9 +67,15 @@ int main(int argc, char* argv[])
     // Step 4: Discrete Cosine Transform (DCT)
     // Transforming 8x8 image blocks from spacial domain --> "frequency domain"
     // Will be applied to each channel
-    std::vector<std::vector<double>> transformed_image_matrix = perform_DCT_operation(yCbCr_img_matrix)
+    perform_DCT_operation(converted_image);
 
-    std::cout << "Hello" << std::endl;
+    // Step 5: Quantization
+    // Removing information from the DCT image
+    // Image Quality - # btw. 0 - 100 to specify how much information you would like to keep
+    // The higher the quality, the higher the number of information that will stay on the image
+    quantization(converted_image, 50);
 
+    // Step 6: Entropy Encoding
+    
     return 0;
 }

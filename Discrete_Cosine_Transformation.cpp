@@ -69,7 +69,7 @@ void transform_DCT_8_by_8_block(YCbCr_Img_Matrix & image_to_transform,
                 sum_YCbCr.cr += (dct_matrix[row][i] * image_to_transform[img_row_idx+i][img_col_idx+col].cr);
             }
 
-            temp_matrix[img_row_idx+row][img_col_idx+col] = sum_YCbCr;
+            temp_matrix[row][col] = sum_YCbCr;
         }
     }
 
@@ -81,9 +81,9 @@ void transform_DCT_8_by_8_block(YCbCr_Img_Matrix & image_to_transform,
 
             for (int i = 0; i < 8; ++i) {
                 // Transposing image DCT_Matrix_Transpose[i][j] = DCT_Matrix[j][i]
-                sum_YCbCr.y  += (temp_matrix[img_row_idx+row][img_col_idx+i].y * dct_matrix[col][i]);
-                sum_YCbCr.cb += (temp_matrix[img_row_idx+row][img_col_idx+i].cb * dct_matrix[col][i]);
-                sum_YCbCr.cr += (temp_matrix[img_row_idx+row][img_col_idx+i].cr * dct_matrix[col][i]);
+                sum_YCbCr.y  += (temp_matrix[row][i].y * dct_matrix[col][i]);
+                sum_YCbCr.cb += (temp_matrix[row][i].cb * dct_matrix[col][i]);
+                sum_YCbCr.cr += (temp_matrix[row][i].cr * dct_matrix[col][i]);
             }
 
             image_to_transform[img_row_idx+row][img_col_idx+col] = sum_YCbCr;
@@ -98,10 +98,13 @@ void transform_DCT_8_by_8_block(YCbCr_Img_Matrix & image_to_transform,
 void perform_DCT_operation(YCbCr_Img_Matrix & image_to_transform) {
 
     std::vector<std::vector<double>> dct_matrix = create_discrete_cosine_transform_matrix();
+
+    int num_img_rows = image_to_transform.size();
+    int num_img_cols = image_to_transform[0].size();
     
     // Need values of YCbCr Image to go from 0-255 --> -128-127 (Subtract 128 to each element)
-    for (int row_idx = 0; row_idx < image_to_transform.size(); ++row_idx) {
-        for (int col_idx = 0; col_idx < image_to_transform[0].size(); ++col_idx) {
+    for (int row_idx = 0; row_idx < num_img_rows; ++row_idx) {
+        for (int col_idx = 0; col_idx < num_img_cols; ++col_idx) {
             image_to_transform[row_idx][col_idx].y  -= 128;
             image_to_transform[row_idx][col_idx].cb -= 128;
             image_to_transform[row_idx][col_idx].cr -= 128;
@@ -109,8 +112,8 @@ void perform_DCT_operation(YCbCr_Img_Matrix & image_to_transform) {
     }
     
 
-    for (int img_row_idx = 0; img_row_idx < image_to_transform.size(); img_row_idx+=8) {
-        for (int img_col_idx = 0; img_col_idx < image_to_transform[0].size(); img_col_idx+=8) {
+    for (int img_row_idx = 0; img_row_idx < num_img_rows; img_row_idx+=8) {
+        for (int img_col_idx = 0; img_col_idx < num_img_cols; img_col_idx+=8) {
             transform_DCT_8_by_8_block(image_to_transform, dct_matrix, img_row_idx, img_col_idx);
         }
     }
