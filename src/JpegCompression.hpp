@@ -18,16 +18,7 @@ class BitmapDecoder
 private:
   void
   createRgbMatrix(
-    std::ifstream &bmp_file);
-
-  uint32_t
-  getWord(
-    std::ifstream &bmp_file);
-
-  void
-  skipBytes(
-    std::ifstream &bmp_file,
-    uint8_t bytes_to_skip);
+    std::ifstream &bmpFile);
 
 public:
   BitmapDecoder(
@@ -37,7 +28,7 @@ public:
   printRgbMatrix(
     void);
 
-  RGB_Img_Matrix rgb_img_matrix;
+  RGB_Img_Matrix rgbImgMatrix;
   uint32_t height;
   uint32_t width;
 };

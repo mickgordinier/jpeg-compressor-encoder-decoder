@@ -55,7 +55,8 @@
         "thread": "cpp",
         "codecvt": "cpp",
         "iomanip": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "cstring": "cpp"
     },
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
