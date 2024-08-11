@@ -2,6 +2,9 @@
 
 YCbCrImgMatrix convertRgbToPaddedYCbCr(const RgbImgMatrix &rgbMatrix);
 static void padYCbCr(YCbCrImgMatrix &yCbCr, uint32_t originalHeight, uint32_t originalWidth);
+RgbImgMatrix convertPaddedYCbCrtoRgb(const YCbCrImgMatrix &yCbCrMatrix,
+                                    std::uint32_t originalHeight,
+                                    std::uint32_t originalWidth);
 
 // Converting RGB image to YCbCr Image. Also padding image to make dimesions multiple of 8.
 /*
@@ -162,4 +165,44 @@ padYCbCr(
       yCbCr[rowIdx][colIdx] = valueToCopy;
     }
   }
+}
+
+RgbImgMatrix
+convertPaddedYCbCrtoRgb(
+  const YCbCrImgMatrix &yCbCrMatrix,
+  std::uint32_t originalHeight,
+  std::uint32_t originalWidth)
+{
+  /*
+    Source: https://www.w3.org/Graphics/JPEG/jfif.pdf
+    "The color space to be used is YCbCr as defined by CCIR 601 (256 levels). The RGB
+    components calculated by linear conversion from YCbCr shall not be gamma corrected
+    (gamma = 1.0). If only one component is used, that component shall be Y."
+
+    YCbCr to RGB Conversion
+    RGB can be computed directly from YCbCr (256 levels) as follows:
+
+    R = Y + (1.402 * (Cr - 128))
+    G = Y + (-0.34414 * (Cb - 128)) + (-0.71414 * (Cr - 128))
+    B = Y + (1.772 * (Cb - 128))
+  */
+  RgbImgMatrix rgbMatrix;
+  rgbMatrix.resize(originalHeight);
+  for (std::uint32_t rowIdx = 0; rowIdx < originalHeight; ++rowIdx) {
+    rgbMatrix[rowIdx].resize(originalWidth);
+  }
+
+  for (std::uint32_t rowIdx = 0; rowIdx < originalHeight; ++rowIdx) {
+    for (std::uint32_t colIdx = 0; colIdx < originalWidth; ++colIdx) {
+      double y = yCbCrMatrix[rowIdx][colIdx].y;
+      double cb = yCbCrMatrix[rowIdx][colIdx].cb;
+      double cr = yCbCrMatrix[rowIdx][colIdx].cr;
+
+      rgbMatrix[rowIdx][colIdx].r = y + (1.402 * (cr - 128));
+      rgbMatrix[rowIdx][colIdx].g = y + (-0.34414 * (cb - 128)) + (-0.71414 * (cr - 128));
+      rgbMatrix[rowIdx][colIdx].b = y + (1.772 * (cb - 128));
+    }
+  }
+
+  return rgbMatrix;
 }

@@ -58,6 +58,12 @@ YCbCrImgMatrix
 convertRgbToPaddedYCbCr(
   const RgbImgMatrix &rgb_matrix);
 
+RgbImgMatrix
+convertPaddedYCbCrtoRgb(
+  const YCbCrImgMatrix &yCbCrMatrix,
+  std::uint32_t originalHeight,
+  std::uint32_t originalWidth);
+
 /* ################# YCBCR TRANSFORMATION END ################# */
 
 /* ################# DISCRETE COSINE TRANFORMATION BEGIN ################# */
