@@ -19,7 +19,7 @@ void run_dct_test(int test_idx) {
     // reading in Matrix we are testing
     std::ifstream original_matrix_file(BASE_MATRIX_FOLDER + "test_" + std::to_string(test_idx) + ".txt");
 
-    YCbCr_Img_Matrix matrix_to_test;
+    YCbCrImgMatrix matrix_to_test;
 
     matrix_to_test.resize(8);
 

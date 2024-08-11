@@ -40,9 +40,9 @@ void runBitmapDecoderTest(std::string bmp_file_name) {
         for (uint32_t col_idx = 0; col_idx < correct_width; ++col_idx) {
             correct_value_file >> color_val_r >> color_val_g >> color_val_b;
 
-            assert(bit_test.rgb_img_matrix[row_idx][col_idx].r == color_val_r);
-            assert(bit_test.rgb_img_matrix[row_idx][col_idx].g == color_val_g);
-            assert(bit_test.rgb_img_matrix[row_idx][col_idx].b == color_val_b);
+            assert(bit_test.RgbImgMatrix[row_idx][col_idx].r == color_val_r);
+            assert(bit_test.RgbImgMatrix[row_idx][col_idx].g == color_val_g);
+            assert(bit_test.RgbImgMatrix[row_idx][col_idx].b == color_val_b);
         }
     }
     std::cout << "Image Matrix Correct!" << std::endl;

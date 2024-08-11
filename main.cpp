@@ -15,10 +15,10 @@ int main(int argc, char* argv[])
     std::string filename = argv[1];
     BitmapDecoder bitmap(filename);
 
-    // // Step 2: Convert RGB matrix to yCbCr Matrix to extract luminance channel from chroma/color channels
-    // // Padding image size to multiple of 8 to have correct MCU size needed for DCT
-    // // Padded pixels will be ignored afterwards
-    // YCbCr_Img_Matrix converted_image = convert_RGB_to_padded_YCbCr(bitmap.rgb_img_matrix);
+    // Step 2: Convert RGB matrix to yCbCr Matrix to extract luminance channel from chroma/color channels
+    // Padding image size to multiple of 8 to have correct MCU size needed for DCT
+    // Padded pixels will be ignored afterwards
+    YCbCrImgMatrix convertedImage = convertRgbToPaddedYCbCr(bitmap.rgbImgMatrix);
 
     // // Step 3: Downsampling Chroma Components TBD
 

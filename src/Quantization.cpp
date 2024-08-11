@@ -14,7 +14,7 @@
 
 // Removing high frequencies present in original image --> Losing high detail for smaller file size
 void quantization(
-  YCbCr_Img_Matrix &transformed_dct_image,
+  YCbCrImgMatrix &transformed_dct_image,
   uint8_t image_quality)
 {
   for (int row_idx = 0; row_idx < transformed_dct_image.size(); ++row_idx)

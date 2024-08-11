@@ -252,7 +252,6 @@ BitmapDecoder::createRgbMatrix(
   // image read goes bottom-up
   for (std::uint32_t rowIdx = height; rowIdx > 0; --rowIdx)
   {
-
     // image read goes from left to right
     for (std::uint32_t colIdx = 0; colIdx < width; ++colIdx)
     {

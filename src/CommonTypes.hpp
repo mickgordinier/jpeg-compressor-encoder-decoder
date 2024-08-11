@@ -15,7 +15,7 @@ struct YCbCr_Val
   double y, cb, cr;
 };
 
-typedef std::vector<std::vector<RGB_Val>> RGB_Img_Matrix;
-typedef std::vector<std::vector<YCbCr_Val>> YCbCr_Img_Matrix;
+typedef std::vector<std::vector<RGB_Val>> RgbImgMatrix;
+typedef std::vector<std::vector<YCbCr_Val>> YCbCrImgMatrix;
 
 #endif // COMMON_TYPES_H

@@ -1,48 +1,51 @@
 #include "JpegCompression.hpp"
 
+YCbCrImgMatrix convertRgbToPaddedYCbCr(const RgbImgMatrix &rgbMatrix);
+static void padYCbCr(YCbCrImgMatrix &yCbCr, uint32_t originalHeight, uint32_t originalWidth);
+
 // Converting RGB image to YCbCr Image. Also padding image to make dimesions multiple of 8.
 /*
-    Source: https://www.thewebmaster.com/jpeg-definitive-guide/
+  Source: https://www.thewebmaster.com/jpeg-definitive-guide/
 
-    The human eye is much more sensitive to fine variations in brightness (luminance) than to changes in color (chroma).
-    JPEG can take advantage of this by converting to the YCbCr color model, which splits the luminance from the chroma.
-    We can then apply stronger compression to the chroma channels with less effect on image quality.
+  The human eye is much more sensitive to fine variations in brightness (luminance) than to changes in color (chroma).
+  JPEG can take advantage of this by converting to the YCbCr color model, which splits the luminance from the chroma.
+  We can then apply stronger compression to the chroma channels with less effect on image quality.
 
-    The YCbCr color model converts from the RGB color model and consists of 3 separate categories:
+  The YCbCr color model converts from the RGB color model and consists of 3 separate categories:
 
-    Luminance (Y) - The luminance data from each red, green, and blue RGB channel is extracted and separated from the chroma data and combined to make the Luminance (Y) channel.
-                    The Y channel, by itself, contains enough data to create a complete black-and-white image.
-    Chroma Blue (Cb) - The Chroma Blue Channel is the RGB blue channel minus the luminance.
-    Chroma Red (Cr) - The Chroma Red Channel is the RGB blue channel minus the luminance.
-    After subtracting the Y, Cb, and Cb channels from the image, the remainder provides the chroma green information. This can be mathematically extracted instead of encoded, saving bandwidth.
+  Luminance (Y) - The luminance data from each red, green, and blue RGB channel is extracted and separated from the chroma data and combined to make the Luminance (Y) channel.
+                  The Y channel, by itself, contains enough data to create a complete black-and-white image.
+  Chroma Blue (Cb) - The Chroma Blue Channel is the RGB blue channel minus the luminance.
+  Chroma Red (Cr) - The Chroma Red Channel is the RGB blue channel minus the luminance.
+  After subtracting the Y, Cb, and Cb channels from the image, the remainder provides the chroma green information. This can be mathematically extracted instead of encoded, saving bandwidth.
 */
-YCbCr_Img_Matrix
-convert_RGB_to_padded_YCbCr(
-  const RGB_Img_Matrix &rgb_matrix)
+YCbCrImgMatrix
+convertRgbToPaddedYCbCr(
+  const RgbImgMatrix &rgbMatrix)
 {
-  YCbCr_Img_Matrix yCbCr_matrix;
+  YCbCrImgMatrix yCbCrMatrix;
 
   // NEED HEIGHT AND WIDTH TO BE MULTIPLE OF 8 TO PROPERLY PERFORM DCT
   // WILL IGNORE PADDED PIXELS AFTERWARDS
-  uint32_t yCbCr_height = rgb_matrix.size();
-  uint32_t yCbCr_width = rgb_matrix[0].size();
+  uint32_t yCbCrHeight = rgbMatrix.size();
+  uint32_t yCbCrWidth = rgbMatrix[0].size();
 
-  if (yCbCr_height % 8 != 0)
+  if (yCbCrHeight % 8 != 0)
   {
-    yCbCr_height += (8 - yCbCr_height % 8);
+    yCbCrHeight += (8 - yCbCrHeight % 8);
   }
 
-  if (yCbCr_width % 8 != 0)
+  if (yCbCrWidth % 8 != 0)
   {
-    yCbCr_width += (8 - yCbCr_width % 8);
+    yCbCrWidth += (8 - yCbCrWidth % 8);
   }
 
   // Resizing yCbCr matrix
-  yCbCr_matrix.resize(yCbCr_height);
+  yCbCrMatrix.resize(yCbCrHeight);
 
-  for (int i = 0; i < yCbCr_matrix.size(); ++i)
+  for (uint32_t rowIdx = 0; rowIdx < yCbCrHeight; ++rowIdx)
   {
-    yCbCr_matrix[i].resize(yCbCr_width);
+    yCbCrMatrix[rowIdx].resize(yCbCrWidth);
   }
 
   // Converting all rgb values to yCbCr values
@@ -52,8 +55,6 @@ convert_RGB_to_padded_YCbCr(
     components calculated by linear conversion from YCbCr shall not be gamma corrected
     (gamma = 1.0). If only one component is used, that component shall be Y."
 
-    ...
-
     RGB to YCbCr Conversion
     YCbCr (256 levels) can be computed directly from 8-bit RGB as follows:
 
@@ -62,38 +63,39 @@ convert_RGB_to_padded_YCbCr(
     Cr =  (0.5     * R) - (0.4187 * G) - (0.0813 * B) + 128
   */
 
-  for (uint32_t row_idx = 0; row_idx < rgb_matrix.size(); ++row_idx)
+  for (uint32_t rowIdx = 0; rowIdx < rgbMatrix.size(); ++rowIdx)
   {
-    for (uint32_t col_idx = 0; col_idx < rgb_matrix[0].size(); ++col_idx)
+    for (uint32_t colIdx = 0; colIdx < rgbMatrix[0].size(); ++colIdx)
     {
 
-      RGB_Val rgb_val = rgb_matrix[row_idx][col_idx];
+      RGB_Val rgbVal = rgbMatrix[rowIdx][colIdx];
 
-      YCbCr_Val yCbCr_val;
+      YCbCr_Val yCbCrVal;
 
       // luminance (Y) channel (AKA Intensity of RGB Color)
-      yCbCr_val.y = (static_cast<double>(rgb_val.r) * 0.299) + (static_cast<double>(rgb_val.g) * 0.587) + (static_cast<double>(rgb_val.b) * 0.114);
+      yCbCrVal.y = (static_cast<double>(rgbVal.r) * 0.299) + (static_cast<double>(rgbVal.g) * 0.587) + (static_cast<double>(rgbVal.b) * 0.114);
 
       // chroma blue (Cb) channel
-      yCbCr_val.cb = (static_cast<double>(rgb_val.r) * -0.1687) + (static_cast<double>(rgb_val.g) * -0.3313) + (static_cast<double>(rgb_val.b) * 0.5) + 128;
+      yCbCrVal.cb = (static_cast<double>(rgbVal.r) * -0.1687) + (static_cast<double>(rgbVal.g) * -0.3313) + (static_cast<double>(rgbVal.b) * 0.5) + 128;
 
       // chroma red (Cr) channel
-      yCbCr_val.cr = (static_cast<double>(rgb_val.r) * 0.5) + (static_cast<double>(rgb_val.g) * -0.4187) + (static_cast<double>(rgb_val.b) * -0.0813) + 128;
+      yCbCrVal.cr = (static_cast<double>(rgbVal.r) * 0.5) + (static_cast<double>(rgbVal.g) * -0.4187) + (static_cast<double>(rgbVal.b) * -0.0813) + 128;
 
-      yCbCr_matrix[row_idx][col_idx] = yCbCr_val;
+      yCbCrMatrix[rowIdx][colIdx] = yCbCrVal;
     }
   }
 
-  pad_YCbCr(yCbCr_matrix, rgb_matrix.size(), rgb_matrix[0].size());
+  padYCbCr(yCbCrMatrix, rgbMatrix.size(), rgbMatrix[0].size());
 
-  return yCbCr_matrix;
+  return yCbCrMatrix;
 }
 
 // Padding with repeated pixels technique to make image size multiple of 8
-void pad_YCbCr(
-  YCbCr_Img_Matrix &yCbCr,
-  uint32_t original_height,
-  uint32_t original_width)
+static void 
+padYCbCr(
+  YCbCrImgMatrix &yCbCr,
+  uint32_t originalHeight,
+  uint32_t originalWidth)
 {
 
   /*
@@ -106,8 +108,6 @@ void pad_YCbCr(
   4:4:4 - 8 x 8 pixels
   4:2:2 - 16 * 8 pixels
   4:2:0 - 16 * 16 pixels
-
-  ...
 
   For JPEG compression algorithms to work, images must only contain complete MCU blocks.
   In other words, the image dimensions must be multiples of an MCU, for example, 8 pixels for the 4:4:4 subsampling ratio.
@@ -125,38 +125,41 @@ void pad_YCbCr(
   Finally, the additional pixels are removed.
   */
 
+ uint32_t numRows = yCbCr.size();
+ uint32_t numCols = yCbCr[0].size();
+
   // Pad same pixels through the padded columns
-  for (uint32_t row_idx = 0; row_idx < original_height; ++row_idx)
+  for (uint32_t rowIdx = 0; rowIdx < originalHeight; ++rowIdx)
   {
 
-    YCbCr_Val value_to_copy = yCbCr[row_idx][original_width - 1];
+    YCbCr_Val valueToCopy = yCbCr[rowIdx][originalWidth - 1];
 
-    for (uint32_t col_idx = original_width; col_idx < yCbCr[0].size(); ++col_idx)
+    for (uint32_t colIdx = originalWidth; colIdx < numCols; ++colIdx)
     {
-      yCbCr[row_idx][col_idx] = value_to_copy;
+      yCbCr[rowIdx][colIdx] = valueToCopy;
     }
   }
 
   // Pad same pixels through the padded rows
-  for (uint32_t col_idx = 0; col_idx < original_width; ++col_idx)
+  for (uint32_t colIdx = 0; colIdx < originalWidth; ++colIdx)
   {
 
-    YCbCr_Val value_to_copy = yCbCr[original_height - 1][col_idx];
+    YCbCr_Val valueToCopy = yCbCr[originalHeight - 1][colIdx];
 
-    for (uint32_t row_idx = original_height; row_idx < yCbCr.size(); ++row_idx)
+    for (uint32_t rowIdx = originalHeight; rowIdx < numRows; ++rowIdx)
     {
-      yCbCr[row_idx][col_idx] = value_to_copy;
+      yCbCr[rowIdx][colIdx] = valueToCopy;
     }
   }
 
   // for the corner pixels
-  YCbCr_Val value_to_copy = yCbCr[original_height - 1][original_width - 1];
+  YCbCr_Val valueToCopy = yCbCr[originalHeight - 1][originalWidth - 1];
 
-  for (uint32_t row_idx = original_height; row_idx < yCbCr.size(); ++row_idx)
+  for (uint32_t rowIdx = originalHeight; rowIdx < yCbCr.size(); ++rowIdx)
   {
-    for (uint32_t col_idx = original_width; col_idx < yCbCr[0].size(); ++col_idx)
+    for (uint32_t colIdx = originalWidth; colIdx < yCbCr[0].size(); ++colIdx)
     {
-      yCbCr[row_idx][col_idx] = value_to_copy;
+      yCbCr[rowIdx][colIdx] = valueToCopy;
     }
   }
 }

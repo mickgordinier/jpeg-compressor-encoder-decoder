@@ -60,13 +60,13 @@ create_discrete_cosine_transform_matrix(
 // Performing an in-place DCT transformation on an 8x8 pixel block within the YCbCr Image
 // DCT Transformation = (DCT Matrix) * (Original Image) * (DCT Matrix Transformed)
 void transform_DCT_8_by_8_block(
-  YCbCr_Img_Matrix &image_to_transform,
+  YCbCrImgMatrix &image_to_transform,
   const std::vector<std::vector<double>> &dct_matrix,
   int img_row_idx,
   int img_col_idx)
 {
   // Need matrix to hold intermediate values
-  YCbCr_Img_Matrix temp_matrix;
+  YCbCrImgMatrix temp_matrix;
   temp_matrix.resize(8);
   for (int i = 0; i < 8; ++i)
   {
@@ -117,7 +117,7 @@ void transform_DCT_8_by_8_block(
 // DCT Transformation = (DCT Matrix) * (Original Image) * (DCT Matrix Transformed)
 // Before computing the DCT of each 8x8 block, each value in the matrix must be recentered around zero. I.e., the midpoint must be 0.
 void perform_DCT_operation(
-  YCbCr_Img_Matrix &image_to_transform)
+  YCbCrImgMatrix &image_to_transform)
 {
   std::vector<std::vector<double>> dct_matrix = create_discrete_cosine_transform_matrix();
 

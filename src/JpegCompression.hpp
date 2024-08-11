@@ -28,7 +28,7 @@ public:
   printRgbMatrix(
     void);
 
-  RGB_Img_Matrix rgbImgMatrix;
+  RgbImgMatrix rgbImgMatrix;
   uint32_t height;
   uint32_t width;
 };
@@ -37,15 +37,9 @@ public:
 
 /* ################# YCBCR TRANSFORMATION BEGIN ################# */
 
-YCbCr_Img_Matrix
-convert_RGB_to_padded_YCbCr(
-  const RGB_Img_Matrix &rgb_matrix);
-
-void
-pad_YCbCr(
-  YCbCr_Img_Matrix &yCbCr,
-  uint32_t original_height,
-  uint32_t original_width);
+YCbCrImgMatrix
+convertRgbToPaddedYCbCr(
+  const RgbImgMatrix &rgb_matrix);
 
 /* ################# YCBCR TRANSFORMATION END ################# */
 
@@ -57,14 +51,14 @@ create_discrete_cosine_transform_matrix(
 
 void
 transform_DCT_8_by_8_block(
-  YCbCr_Img_Matrix &image_to_transform,
+  YCbCrImgMatrix &image_to_transform,
   const std::vector<std::vector<double>> &dct_matrix,
   int img_row_idx,
   int img_col_idx);
 
 void
 perform_DCT_operation(
-  YCbCr_Img_Matrix &image_to_transform);
+  YCbCrImgMatrix &image_to_transform);
 
 /* ################# DISCRETE COSINE TRANFORMATION END ################# */
 
@@ -91,7 +85,7 @@ const std::vector<std::vector<double>> CHROMA_QUANTIZATION_MATRIX = {
   {99, 99, 99, 99, 99, 99, 99, 99}};
 
 void quantization(
-  YCbCr_Img_Matrix &transformed_dct_image,
+  YCbCrImgMatrix &transformed_dct_image,
   uint8_t image_quality);
 
 /* ################# QUANTIZATION END ################# */
