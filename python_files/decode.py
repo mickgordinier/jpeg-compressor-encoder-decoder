@@ -39,9 +39,9 @@ important_colors = int.from_bytes(b[50:54], "little")
 img_matrix = np.zeros((height,width,3))
 
 
-for row_idx in range(14):
-  for col_idx in range(14):
-    byte_addr = 54 + row_idx*44 + col_idx*3
+for rowIdx in range(14):
+  for colIdx in range(14):
+    byte_addr = 54 + rowIdx*44 + colIdx*3
 print(byte_addr)
 
 

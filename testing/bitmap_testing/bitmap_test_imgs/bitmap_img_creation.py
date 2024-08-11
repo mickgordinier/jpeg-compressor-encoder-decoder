@@ -5,15 +5,15 @@ import numpy as np
 # img_test_description that can be copied onto variable "b" below
 def getValidString(b):
     valid_matrix_str = "[\n"
-    for row_idx in range(b.shape[0]):
+    for rowIdx in range(b.shape[0]):
         valid_matrix_str += "["
-        for col_idx in range(b.shape[1]):
-            valid_matrix_str += "[" + str(b[row_idx, col_idx, 0]) + ", "
-            valid_matrix_str += str(b[row_idx, col_idx, 1]) + ", "
-            valid_matrix_str += str(b[row_idx, col_idx, 2]) + "]"
-            if (col_idx != b.shape[1]-1):
+        for colIdx in range(b.shape[1]):
+            valid_matrix_str += "[" + str(b[rowIdx, colIdx, 0]) + ", "
+            valid_matrix_str += str(b[rowIdx, colIdx, 1]) + ", "
+            valid_matrix_str += str(b[rowIdx, colIdx, 2]) + "]"
+            if (colIdx != b.shape[1]-1):
                 valid_matrix_str += ", "
-        if (row_idx != b.shape[0]-1):
+        if (rowIdx != b.shape[0]-1):
             valid_matrix_str += "],\n"
         else:
             valid_matrix_str += "]\n"

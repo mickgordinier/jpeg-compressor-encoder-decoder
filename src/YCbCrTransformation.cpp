@@ -68,9 +68,9 @@ convertRgbToPaddedYCbCr(
     for (uint32_t colIdx = 0; colIdx < rgbMatrix[0].size(); ++colIdx)
     {
 
-      RGB_Val rgbVal = rgbMatrix[rowIdx][colIdx];
+      RgbVal rgbVal = rgbMatrix[rowIdx][colIdx];
 
-      YCbCr_Val yCbCrVal;
+      YCbCrVal yCbCrVal;
 
       // luminance (Y) channel (AKA Intensity of RGB Color)
       yCbCrVal.y = (static_cast<double>(rgbVal.r) * 0.299) + (static_cast<double>(rgbVal.g) * 0.587) + (static_cast<double>(rgbVal.b) * 0.114);
@@ -132,7 +132,7 @@ padYCbCr(
   for (uint32_t rowIdx = 0; rowIdx < originalHeight; ++rowIdx)
   {
 
-    YCbCr_Val valueToCopy = yCbCr[rowIdx][originalWidth - 1];
+    YCbCrVal valueToCopy = yCbCr[rowIdx][originalWidth - 1];
 
     for (uint32_t colIdx = originalWidth; colIdx < numCols; ++colIdx)
     {
@@ -144,7 +144,7 @@ padYCbCr(
   for (uint32_t colIdx = 0; colIdx < originalWidth; ++colIdx)
   {
 
-    YCbCr_Val valueToCopy = yCbCr[originalHeight - 1][colIdx];
+    YCbCrVal valueToCopy = yCbCr[originalHeight - 1][colIdx];
 
     for (uint32_t rowIdx = originalHeight; rowIdx < numRows; ++rowIdx)
     {
@@ -153,7 +153,7 @@ padYCbCr(
   }
 
   // for the corner pixels
-  YCbCr_Val valueToCopy = yCbCr[originalHeight - 1][originalWidth - 1];
+  YCbCrVal valueToCopy = yCbCr[originalHeight - 1][originalWidth - 1];
 
   for (uint32_t rowIdx = originalHeight; rowIdx < yCbCr.size(); ++rowIdx)
   {

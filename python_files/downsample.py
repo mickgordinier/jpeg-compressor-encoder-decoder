@@ -20,29 +20,29 @@ def subsample_422_bilinear_interpolation(cb, cr):
     num_cols = cb.shape[1]
     num_rows = cb.shape[0]
     
-    for col_idx in range(0, num_cols, 2):
-        cb[:, col_idx] = (cb[:, col_idx] + cb[:, col_idx+1]) // 2
-        cr[:, col_idx] = (cr[:, col_idx] + cr[:, col_idx+1]) // 2
+    for colIdx in range(0, num_cols, 2):
+        cb[:, colIdx] = (cb[:, colIdx] + cb[:, colIdx+1]) // 2
+        cr[:, colIdx] = (cr[:, colIdx] + cr[:, colIdx+1]) // 2
         
     # resampling back to original image size
     # usinig nearest neighbor on edge pixels which bilinear interpolation is not possible
     
     # ignoring last unknown column if num rows is even
-    for col_idx in range(1, num_cols-1, 2):
+    for colIdx in range(1, num_cols-1, 2):
         
         # updating first row (linear interpolation edge case)
-        cb[0, col_idx] = (cb[0, col_idx-1] + cb[0, col_idx+1]) // 2
-        cb[num_rows-1, col_idx] = (cb[num_rows-1, col_idx-1] + cb[num_rows-1, col_idx+1]) // 2
+        cb[0, colIdx] = (cb[0, colIdx-1] + cb[0, colIdx+1]) // 2
+        cb[num_rows-1, colIdx] = (cb[num_rows-1, colIdx-1] + cb[num_rows-1, colIdx+1]) // 2
         
         # updating last row (linear interpolation edge case)
-        cr[0, col_idx] = (cr[0, col_idx-1] + cr[0, col_idx+1]) // 2
-        cr[num_rows-1, col_idx] = (cr[num_rows-1, col_idx-1] + cr[num_rows-1, col_idx+1]) // 2
+        cr[0, colIdx] = (cr[0, colIdx-1] + cr[0, colIdx+1]) // 2
+        cr[num_rows-1, colIdx] = (cr[num_rows-1, colIdx-1] + cr[num_rows-1, colIdx+1]) // 2
         
         # reduced equation for bilinear interpolation
         # each corner holds equal weight for pixel determination
-        for row_idx in range(1,num_rows-1):
-            cb[row_idx, col_idx] = (cb[row_idx-1, col_idx-1] + cb[row_idx-1, col_idx+1] + cb[row_idx+1, col_idx+1] + cb[row_idx+1, col_idx-1]) // 4
-            cr[row_idx, col_idx] = (cr[row_idx-1, col_idx-1] + cr[row_idx-1, col_idx+1] + cr[row_idx+1, col_idx+1] + cr[row_idx+1, col_idx-1]) // 4
+        for rowIdx in range(1,num_rows-1):
+            cb[rowIdx, colIdx] = (cb[rowIdx-1, colIdx-1] + cb[rowIdx-1, colIdx+1] + cb[rowIdx+1, colIdx+1] + cb[rowIdx+1, colIdx-1]) // 4
+            cr[rowIdx, colIdx] = (cr[rowIdx-1, colIdx-1] + cr[rowIdx-1, colIdx+1] + cr[rowIdx+1, colIdx+1] + cr[rowIdx+1, colIdx-1]) // 4
     
     # choosing left pixel for last column (edge case)
     if num_rows % 2 == 0:

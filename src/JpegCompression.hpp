@@ -2,8 +2,14 @@
 #define JPEGCOMPRESSION_H
 
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <cstring>
 #include <array>
 #include <vector>
+#include <cmath>
+#include <math.h>
+#include <cstdint>
 #include "CommonTypes.hpp"
 
 /*
@@ -19,6 +25,12 @@ private:
   void
   createRgbMatrix(
     std::ifstream &bmpFile);
+  
+  std::uint32_t fileSizeBytes;
+  std::uint32_t reservedBytes;
+  std::uint32_t imageSize;
+  std::uint32_t xResolution;
+  std::uint32_t yResolution;
 
 public:
   BitmapDecoder(
@@ -27,6 +39,11 @@ public:
   void
   printRgbMatrix(
     void);
+  
+  void
+  createOutputFile(
+    std::string outFilename,
+    RgbImgMatrix &newImageMatrix);
 
   RgbImgMatrix rgbImgMatrix;
   uint32_t height;
@@ -45,20 +62,23 @@ convertRgbToPaddedYCbCr(
 
 /* ################# DISCRETE COSINE TRANFORMATION BEGIN ################# */
 
-std::vector<std::vector<double>>
-create_discrete_cosine_transform_matrix(
-  void);
+// Instead of recomputing the dct Matrix each time, decided it's best to create it
+// Additionally, as the DCT Matrix is orthogonal, inverse(dctMatrix) = transpose(dctMatrix)
+// Source: https://dev.to/marycheung021213/understanding-dct-and-quantization-in-jpeg-compression-1col#:~:text=Discrete%20Cosine%20Transform%20(DCT)%20is,the%20summation%20of%20cosine%20functions.
+const std::vector<std::vector<double>> dctMatrix = {
+ {0.3535533,  0.3535533,  0.3535533,  0.3535533,  0.3535533,  0.3535533,  0.3535533,  0.3535533},
+ {0.4903926,  0.4157348,  0.2777851,  0.0975451, -0.0975451, -0.2777851, -0.4157348, -0.4903926},
+ {0.4619397,  0.1913417, -0.1913417, -0.4619397, -0.4619397, -0.1913417,  0.1913417,  0.4619397},
+ {0.4157348, -0.0975451, -0.4903926, -0.2777851,  0.2777851,  0.4903926,  0.0975451, -0.4157348},
+ {0.3535533, -0.3535533, -0.3535533,  0.3535533,  0.3535533, -0.3535533, -0.3535533,  0.3535533},
+ {0.2777851, -0.4903926,  0.0975451,  0.4157348, -0.4157348, -0.0975451,  0.4903926, -0.2777851},
+ {0.1913417, -0.4619397,  0.4619397, -0.1913417, -0.1913417,  0.4619397, -0.4619397,  0.1913417},
+ {0.0975451, -0.2777851,  0.4157348, -0.4903926,  0.4903926, -0.4157348,  0.2777851, -0.0975451}
+};
 
 void
-transform_DCT_8_by_8_block(
-  YCbCrImgMatrix &image_to_transform,
-  const std::vector<std::vector<double>> &dct_matrix,
-  int img_row_idx,
-  int img_col_idx);
-
-void
-perform_DCT_operation(
-  YCbCrImgMatrix &image_to_transform);
+performDCT(
+  YCbCrImgMatrix &imageToTransform);
 
 /* ################# DISCRETE COSINE TRANFORMATION END ################# */
 
@@ -85,7 +105,7 @@ const std::vector<std::vector<double>> CHROMA_QUANTIZATION_MATRIX = {
   {99, 99, 99, 99, 99, 99, 99, 99}};
 
 void quantization(
-  YCbCrImgMatrix &transformed_dct_image,
+  YCbCrImgMatrix &dctImage,
   uint8_t image_quality);
 
 /* ################# QUANTIZATION END ################# */

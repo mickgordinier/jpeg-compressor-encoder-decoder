@@ -1,9 +1,12 @@
-#include <vector>
-#include <cmath>
-#include <array>
-#include <cstdint>
-#include <iostream>
 #include "JpegCompression.hpp"
+
+static void transformDctBlock_8x8(YCbCrImgMatrix &imageToTransform, 
+                                  const std::vector<std::vector<double>> &dctMatrix, 
+                                  int rowIdx, int colIdx);
+static void shiftImageValuesBack128(YCbCrImgMatrix &imageToTransform, 
+                                    std::uint32_t numRows, std::uint32_t numCols);
+
+void performDCT(YCbCrImgMatrix &imageToTransform);
 
 /*
  * Source: https://www.opennet.ru/docs/formats/jpeg.txt
@@ -21,94 +24,76 @@ The idea behind DCT is that any function can be represented by the summation of 
 DCT is a reversible process and inherently lossless.
 */
 
-// creates the 8x8 DCT Transformation Matrix
-// Source: https://dev.to/marycheung021213/understanding-dct-and-quantization-in-jpeg-compression-1col#:~:text=Discrete%20Cosine%20Transform%20(DCT)%20is,the%20summation%20of%20cosine%20functions.
-std::vector<std::vector<double>>
-create_discrete_cosine_transform_matrix(
-  void)
-{
-  std::vector<std::vector<double>> dct_matrix;
-
-  // Resizing matrix to be 8x8
-  dct_matrix.resize(8);
-
-  for (int i = 0; i < 8; ++i)
-  {
-    dct_matrix[i].resize(8);
-  }
-
-  // entire first row is sqrt(1/N)
-  // using double for more precise percision
-  double dct_val = std::sqrt(1.0 / 8.0);
-  for (uint8_t col_idx = 0; col_idx < 8; ++col_idx)
-  {
-    dct_matrix[0][col_idx] = dct_val;
-  }
-
-  // all values multiplied by sqrt(2/8) == sqrt(1/4) == 1/2
-  for (uint8_t row_idx = 1; row_idx < 8; ++row_idx)
-  {
-    for (uint8_t col_idx = 0; col_idx < 8; ++col_idx)
-    {
-      dct_matrix[row_idx][col_idx] = 0.5 * cos(((2 * col_idx + 1) * row_idx * M_PI) / 16);
-    }
-  }
-
-  return dct_matrix;
-}
-
 // Performing an in-place DCT transformation on an 8x8 pixel block within the YCbCr Image
 // DCT Transformation = (DCT Matrix) * (Original Image) * (DCT Matrix Transformed)
-void transform_DCT_8_by_8_block(
-  YCbCrImgMatrix &image_to_transform,
-  const std::vector<std::vector<double>> &dct_matrix,
-  int img_row_idx,
-  int img_col_idx)
+static void
+transformDctBlock_8x8(
+  YCbCrImgMatrix &imageToTransform,
+  int rowIdx,
+  int colIdx)
 {
   // Need matrix to hold intermediate values
-  YCbCrImgMatrix temp_matrix;
-  temp_matrix.resize(8);
-  for (int i = 0; i < 8; ++i)
+  YCbCrImgMatrix tempMatrix;
+  tempMatrix.resize(8);
+  for (int rowIdx = 0; rowIdx < 8; ++rowIdx)
   {
-    temp_matrix[i].resize(8);
+    tempMatrix[rowIdx].resize(8);
   }
 
-  // 1. Make transformed_image = dct_matrix * Original Image (F)
+  // 1. Make transformed_image = dctMatrix * Original Image (F)
   for (int row = 0; row < 8; ++row)
   {
     for (int col = 0; col < 8; ++col)
     {
 
-      YCbCr_Val sum_YCbCr = {0, 0, 0};
+      YCbCrVal sum_YCbCr = {0, 0, 0};
 
       for (int i = 0; i < 8; ++i)
       {
-        sum_YCbCr.y += (dct_matrix[row][i] * image_to_transform[img_row_idx + i][img_col_idx + col].y);
-        sum_YCbCr.cb += (dct_matrix[row][i] * image_to_transform[img_row_idx + i][img_col_idx + col].cb);
-        sum_YCbCr.cr += (dct_matrix[row][i] * image_to_transform[img_row_idx + i][img_col_idx + col].cr);
+        sum_YCbCr.y += (dctMatrix[row][i] * imageToTransform[rowIdx + i][colIdx + col].y);
+        sum_YCbCr.cb += (dctMatrix[row][i] * imageToTransform[rowIdx + i][colIdx + col].cb);
+        sum_YCbCr.cr += (dctMatrix[row][i] * imageToTransform[rowIdx + i][colIdx + col].cr);
       }
 
-      temp_matrix[row][col] = sum_YCbCr;
+      tempMatrix[row][col] = sum_YCbCr;
     }
   }
 
-  // 2. Make transformed_image = transformed_image * DCT_Transposed
+  // 2. Make transformed_image = matrix multiplication transformed_image * DCT_Transposed
   for (int row = 0; row < 8; ++row)
   {
     for (int col = 0; col < 8; ++col)
     {
 
-      YCbCr_Val sum_YCbCr = {0, 0, 0};
+      YCbCrVal sum_YCbCr = {0, 0, 0};
 
       for (int i = 0; i < 8; ++i)
       {
         // Transposing image DCT_Matrix_Transpose[i][j] = DCT_Matrix[j][i]
-        sum_YCbCr.y += (temp_matrix[row][i].y * dct_matrix[col][i]);
-        sum_YCbCr.cb += (temp_matrix[row][i].cb * dct_matrix[col][i]);
-        sum_YCbCr.cr += (temp_matrix[row][i].cr * dct_matrix[col][i]);
+        sum_YCbCr.y += (tempMatrix[row][i].y * dctMatrix[col][i]);
+        sum_YCbCr.cb += (tempMatrix[row][i].cb * dctMatrix[col][i]);
+        sum_YCbCr.cr += (tempMatrix[row][i].cr * dctMatrix[col][i]);
       }
 
-      image_to_transform[img_row_idx + row][img_col_idx + col] = sum_YCbCr;
+      imageToTransform[rowIdx + row][colIdx + col] = sum_YCbCr;
+    }
+  }
+}
+
+static void
+shiftImageValuesBack128(
+  YCbCrImgMatrix &imageToTransform, 
+  std::uint32_t numRows, 
+  std::uint32_t numCols)
+{
+  // Need values of YCbCr Image to go from 0-255 --> -128-127 (Subtract 128 to each element)
+  for (std::uint32_t rowIdx = 0; rowIdx < numRows; ++rowIdx)
+  {
+    for (std::uint32_t colIdx = 0; colIdx < numCols; ++colIdx)
+    {
+      imageToTransform[rowIdx][colIdx].y -= 128;
+      imageToTransform[rowIdx][colIdx].cb -= 128;
+      imageToTransform[rowIdx][colIdx].cr -= 128;
     }
   }
 }
@@ -116,30 +101,63 @@ void transform_DCT_8_by_8_block(
 // Performs DCT Operation
 // DCT Transformation = (DCT Matrix) * (Original Image) * (DCT Matrix Transformed)
 // Before computing the DCT of each 8x8 block, each value in the matrix must be recentered around zero. I.e., the midpoint must be 0.
-void perform_DCT_operation(
-  YCbCrImgMatrix &image_to_transform)
+void performDCT(
+  YCbCrImgMatrix &imageToTransform)
 {
-  std::vector<std::vector<double>> dct_matrix = create_discrete_cosine_transform_matrix();
-
-  int num_img_rows = image_to_transform.size();
-  int num_img_cols = image_to_transform[0].size();
+  std::uint32_t numRows = imageToTransform.size();
+  std::uint32_t numCols = imageToTransform[0].size();
 
   // Need values of YCbCr Image to go from 0-255 --> -128-127 (Subtract 128 to each element)
-  for (int row_idx = 0; row_idx < num_img_rows; ++row_idx)
-  {
-    for (int col_idx = 0; col_idx < num_img_cols; ++col_idx)
-    {
-      image_to_transform[row_idx][col_idx].y -= 128;
-      image_to_transform[row_idx][col_idx].cb -= 128;
-      image_to_transform[row_idx][col_idx].cr -= 128;
-    }
-  }
+  // This is to have a valid midpoint of 0
+  shiftImageValuesBack128(imageToTransform, numRows, numCols);
 
-  for (int img_row_idx = 0; img_row_idx < num_img_rows; img_row_idx += 8)
+  for (std::uint32_t rowIdx = 0; rowIdx < numRows; rowIdx += 8)
   {
-    for (int img_col_idx = 0; img_col_idx < num_img_cols; img_col_idx += 8)
+    for (std::uint32_t colIdx = 0; colIdx < numCols; colIdx += 8)
     {
-      transform_DCT_8_by_8_block(image_to_transform, dct_matrix, img_row_idx, img_col_idx);
+      transformDctBlock_8x8(imageToTransform, rowIdx, colIdx);
     }
   }
 }
+
+static void
+shiftImageValuesForward128(
+  YCbCrImgMatrix &imageToTransform, 
+  std::uint32_t numRows, 
+  std::uint32_t numCols)
+{
+  // Need values of YCbCr Image to go from 0-255 --> -128-127 (Subtract 128 to each element)
+  for (std::uint32_t rowIdx = 0; rowIdx < numRows; ++rowIdx)
+  {
+    for (std::uint32_t colIdx = 0; colIdx < numCols; ++colIdx)
+    {
+      imageToTransform[rowIdx][colIdx].y += 128;
+      imageToTransform[rowIdx][colIdx].cb += 128;
+      imageToTransform[rowIdx][colIdx].cr += 128;
+    }
+  }
+}
+
+// // Performs Inverse DCT Operation
+// // Compressed Image = inv(DCT Matrix) * (DCT Image) * inv(DCT Matrix Transposed)
+// //                  = (DCT Matrix Transposed) * (DCT Image) * (DCT Matrix)
+// // Before computing the DCT of each 8x8 block, each value in the matrix must be recentered around zero. I.e., the midpoint must be 0.
+// void performIDCT(
+//   YCbCrImgMatrix &imageToTransform)
+// {
+//   std::uint32_t numRows = imageToTransform.size();
+//   std::uint32_t numCols = imageToTransform[0].size();
+
+//   // Need values of YCbCr Image to go from 0-255 --> -128-127 (Subtract 128 to each element)
+//   // This is to have a valid midpoint of 0
+//   shiftImageValuesBack128(imageToTransform, numRows, numCols);
+
+//   for (std::uint32_t rowIdx = 0; rowIdx < numRows; rowIdx += 8)
+//   {
+//     for (std::uint32_t colIdx = 0; colIdx < numCols; colIdx += 8)
+//     {
+//       transformIDctBlock_8x8(imageToTransform, rowIdx, colIdx);
+//     }
+//   }
+// }
+

@@ -36,13 +36,13 @@ void runBitmapDecoderTest(std::string bmp_file_name) {
 
     uint32_t color_val_r, color_val_g, color_val_b;
 
-    for (uint32_t row_idx = 0; row_idx < correct_height; ++row_idx) {
-        for (uint32_t col_idx = 0; col_idx < correct_width; ++col_idx) {
+    for (uint32_t rowIdx = 0; rowIdx < correct_height; ++rowIdx) {
+        for (uint32_t colIdx = 0; colIdx < correct_width; ++colIdx) {
             correct_value_file >> color_val_r >> color_val_g >> color_val_b;
 
-            assert(bit_test.RgbImgMatrix[row_idx][col_idx].r == color_val_r);
-            assert(bit_test.RgbImgMatrix[row_idx][col_idx].g == color_val_g);
-            assert(bit_test.RgbImgMatrix[row_idx][col_idx].b == color_val_b);
+            assert(bit_test.RgbImgMatrix[rowIdx][colIdx].r == color_val_r);
+            assert(bit_test.RgbImgMatrix[rowIdx][colIdx].g == color_val_g);
+            assert(bit_test.RgbImgMatrix[rowIdx][colIdx].b == color_val_b);
         }
     }
     std::cout << "Image Matrix Correct!" << std::endl;

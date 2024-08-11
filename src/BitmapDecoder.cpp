@@ -7,6 +7,15 @@
 #include <cstring>
 #include "JpegCompression.hpp"
 
+#define HEADER_SIGNATURE     "BM"
+#define OFFSET_TO_PIXEL_DATA 54   // (14 Byte Header + 40 byte InfoHeader)
+#define INFOHEADER_SIZE      40   // Size of BITMAPINFOHEADER
+#define NUM_COLOR_PLANES     1
+#define BITS_PER_PIXELS      24
+#define COMPRESSION_TYPE     0
+#define NUM_COLORS           0
+#define NUM_IMPORTANT_COLORS 0
+
 enum ColorLayer
 {
   RED = 0,
@@ -17,7 +26,7 @@ enum ColorLayer
 static std::uint32_t getWord(std::ifstream &bmp_file);
 static std::uint32_t getHalfword(std::ifstream &bmp_file);
 static void          skipBytes(std::ifstream &bmp_file, std::uint8_t bytes_to_skip);
-static const RGB_Val getBitmapRgb(std::ifstream &bmpFile);
+static const RgbVal getBitmapRgb(std::ifstream &bmpFile);
 
 #ifdef BITMAP_DEBUG
   static void
@@ -95,20 +104,22 @@ BitmapDecoder::BitmapDecoder(
     exit(-1);
   }
 
+  fileSizeBytes = getWord(bmp_file);
+
+  reservedBytes = getWord(bmp_file);
+
   #ifdef BITMAP_DEBUG
     std::cout << std::endl << "########################################" << std::endl << std::endl;
     std::cout << "DEBUG: Reading in Bitmap information" << std::endl <<std::endl;
 
     std::cout << "Bitmap Header Information" << std::endl;
     std::cout << "Header Signature: " << headerSignature << std::endl;
-    bitmapDebugPrint("File Size (Bytes)", getWord(bmp_file));
-    skipBytes(bmp_file, 4);
+    bitmapDebugPrint("File Size (Bytes)", fileSizeBytes);
+    bitmapDebugPrint("Reserved Bytes Value", reservedBytes);
     bitmapDebugPrint("Offset to Pixel Data (Bytes)", getWord(bmp_file));
   #else
-    // ignore next 4 bytes  (file size in bytes)
-    // ignore next 4 byes   (Reserved and unused)
     // ignore next 4 bytes  (offset from beginning of file to beginning of bitmap data)
-    skipBytes(bmp_file, 14);
+    skipBytes(bmp_file, 4);
   #endif
 
   /* The size of the InfoHeader determine what version we are dealing with*/
@@ -181,10 +192,14 @@ BitmapDecoder::BitmapDecoder(
     exit(-1);
   }
 
+  imageSize = getWord(bmp_file);
+  xResolution = getWord(bmp_file);
+  yResolution = getWord(bmp_file);
+
   #ifdef BITMAP_DEBUG
-    bitmapDebugPrint("Image Size (Bytes)", getWord(bmp_file));
-    bitmapDebugPrint("X-resolution (Pixel per Meter)", getWord(bmp_file));
-    bitmapDebugPrint("Y-resolution (Pixel per Meter)", getWord(bmp_file));
+    bitmapDebugPrint("Image Size (Bytes)", imageSize);
+    bitmapDebugPrint("X-resolution (Pixel per Meter)", xResolution);
+    bitmapDebugPrint("Y-resolution (Pixel per Meter)", yResolution);
     bitmapDebugPrint("Number of Colors", getWord(bmp_file));
   #else
     // ignore next 4 bytes (Image size in bytes)
@@ -209,16 +224,18 @@ BitmapDecoder::BitmapDecoder(
     std::cout << std::endl << "########################################" << std::endl << std::endl;
   #endif
 
+  skipBytes(bmp_file, infoHeaderSize - INFOHEADER_SIZE);
+
   // creating 3D vector of size height x width x 3 layers for RGB
   BitmapDecoder::createRgbMatrix(bmp_file);
 }
 
 /* Bytes are read in as {8-bit blue, 8-bit green, 8-bit red} in 24-bit rgb */
-static const RGB_Val
+static const RgbVal
 getBitmapRgb(
   std::ifstream &bmpFile)
 {
-  RGB_Val rgbVal;
+  RgbVal rgbVal;
   rgbVal.b = bmpFile.get();
   rgbVal.g = bmpFile.get();
   rgbVal.r = bmpFile.get();
@@ -322,4 +339,50 @@ BitmapDecoder::printRgbMatrix(
     std::cout << "]" << std::endl << std::endl;
   }
   std::cout << std::endl;
+}
+
+static void
+putNBytes(
+  std::ofstream &outFile,
+  std::uint32_t numberToWrite,
+  std::uint8_t numBytes)
+{
+  for (uint8_t byteIdx = 0; byteIdx < numBytes; ++byteIdx) {
+    outFile.put(numberToWrite & 0xFF);
+    numberToWrite >>= 8;
+  }
+}
+
+void
+BitmapDecoder::createOutputFile(
+  std::string outFilename,
+  RgbImgMatrix &newImageMatrix)
+{
+  std::ofstream outFile(outFilename, std::ios_base::binary);
+
+  outFile << HEADER_SIGNATURE;
+
+  putNBytes(outFile, fileSizeBytes, 4);
+  putNBytes(outFile, reservedBytes, 4);
+  putNBytes(outFile, OFFSET_TO_PIXEL_DATA, 4);
+
+  putNBytes(outFile, INFOHEADER_SIZE, 4);
+  putNBytes(outFile, width, 4);
+  putNBytes(outFile, height, 4);
+  putNBytes(outFile, NUM_COLOR_PLANES, 2);
+  putNBytes(outFile, BITS_PER_PIXELS, 2);
+  putNBytes(outFile, COMPRESSION_TYPE, 4);
+  putNBytes(outFile, imageSize, 4);
+  putNBytes(outFile, xResolution, 4);
+  putNBytes(outFile, yResolution, 4);
+  putNBytes(outFile, NUM_COLORS, 4);
+  putNBytes(outFile, NUM_IMPORTANT_COLORS, 4);
+
+  for (std::uint32_t rowIdx = height; rowIdx > 0; --rowIdx) {
+    for (std::uint32_t colIdx = 0; colIdx < width; ++colIdx) {
+      outFile.put(newImageMatrix[rowIdx-1][colIdx].b);
+      outFile.put(newImageMatrix[rowIdx-1][colIdx].g);
+      outFile.put(newImageMatrix[rowIdx-1][colIdx].r);
+    }
+  }
 }

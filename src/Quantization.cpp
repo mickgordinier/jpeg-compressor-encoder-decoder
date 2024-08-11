@@ -1,4 +1,3 @@
-#include <math.h>
 #include "JpegCompression.hpp"
 
 /*
@@ -14,16 +13,16 @@
 
 // Removing high frequencies present in original image --> Losing high detail for smaller file size
 void quantization(
-  YCbCrImgMatrix &transformed_dct_image,
+  YCbCrImgMatrix &dctImage,
   uint8_t image_quality)
 {
-  for (int row_idx = 0; row_idx < transformed_dct_image.size(); ++row_idx)
+  for (std::uint32_t rowIdx = 0; rowIdx < dctImage.size(); ++rowIdx)
   {
-    for (int col_idx = 0; col_idx < transformed_dct_image[0].size(); ++col_idx)
+    for (std::uint32_t colIdx = 0; colIdx < dctImage[0].size(); ++colIdx)
     {
-      transformed_dct_image[row_idx][col_idx].y = std::round(transformed_dct_image[row_idx][col_idx].y / LUMINANCE_QUANTIZATION_MATRIX[row_idx % 8][col_idx % 8]);
-      transformed_dct_image[row_idx][col_idx].cb = std::round(transformed_dct_image[row_idx][col_idx].cb / CHROMA_QUANTIZATION_MATRIX[row_idx % 8][col_idx % 8]);
-      transformed_dct_image[row_idx][col_idx].cr = std::round(transformed_dct_image[row_idx][col_idx].cr / CHROMA_QUANTIZATION_MATRIX[row_idx % 8][col_idx % 8]);
+      dctImage[rowIdx][colIdx].y = std::round(dctImage[rowIdx][colIdx].y / LUMINANCE_QUANTIZATION_MATRIX[rowIdx % 8][colIdx % 8]);
+      dctImage[rowIdx][colIdx].cb = std::round(dctImage[rowIdx][colIdx].cb / CHROMA_QUANTIZATION_MATRIX[rowIdx % 8][colIdx % 8]);
+      dctImage[rowIdx][colIdx].cr = std::round(dctImage[rowIdx][colIdx].cr / CHROMA_QUANTIZATION_MATRIX[rowIdx % 8][colIdx % 8]);
     }
   }
 }

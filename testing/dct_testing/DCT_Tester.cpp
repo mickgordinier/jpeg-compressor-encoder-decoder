@@ -30,30 +30,30 @@ void run_dct_test(int test_idx) {
 
     double read_Y, read_Cb, read_Cr;
 
-    for (uint8_t row_idx = 0; row_idx < 8; ++row_idx) {
-        for (uint8_t col_idx = 0; col_idx < 8; ++col_idx) {
+    for (uint8_t rowIdx = 0; rowIdx < 8; ++rowIdx) {
+        for (uint8_t colIdx = 0; colIdx < 8; ++colIdx) {
             original_matrix_file >> read_Y >> read_Cb >> read_Cr;
 
-            matrix_to_test[row_idx][col_idx].y = read_Y;
-            matrix_to_test[row_idx][col_idx].cb = read_Cb;
-            matrix_to_test[row_idx][col_idx].cr = read_Cr;
+            matrix_to_test[rowIdx][colIdx].y = read_Y;
+            matrix_to_test[rowIdx][colIdx].cb = read_Cb;
+            matrix_to_test[rowIdx][colIdx].cr = read_Cr;
         }
     }
 
     // performs inplace DCT operation
-    perform_DCT_operation(matrix_to_test);
+    performDCT(matrix_to_test);
     
     // comparing to true correct matrix output
     std::ifstream correct_matrix_file(BASE_CORRECT_FOLDER + "test_" + std::to_string(test_idx) + "_correct.txt");
 
-    for (uint8_t row_idx = 0; row_idx < 8; ++row_idx) {
-        for (uint8_t col_idx = 0; col_idx < 8; ++col_idx) {
+    for (uint8_t rowIdx = 0; rowIdx < 8; ++rowIdx) {
+        for (uint8_t colIdx = 0; colIdx < 8; ++colIdx) {
 
             correct_matrix_file >> read_Y >> read_Cb >> read_Cr;
 
-            assert(fabs(matrix_to_test[row_idx][col_idx].y - read_Y) < EPSILON);
-            assert(fabs(matrix_to_test[row_idx][col_idx].cb - read_Cb) < EPSILON);
-            assert(fabs(matrix_to_test[row_idx][col_idx].cr - read_Cr) < EPSILON);
+            assert(fabs(matrix_to_test[rowIdx][colIdx].y - read_Y) < EPSILON);
+            assert(fabs(matrix_to_test[rowIdx][colIdx].cb - read_Cb) < EPSILON);
+            assert(fabs(matrix_to_test[rowIdx][colIdx].cr - read_Cr) < EPSILON);
         }
     }
     

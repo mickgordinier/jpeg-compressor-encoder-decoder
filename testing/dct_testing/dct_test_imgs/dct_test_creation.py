@@ -26,13 +26,13 @@ def print_to_file(input_bitmap_matrix, filename):
 
 def main():
     
-    dct_matrix = np.zeros((8,8))
+    dctMatrix = np.zeros((8,8))
 
-    dct_matrix[0,:] = np.sqrt(1/8)
+    dctMatrix[0,:] = np.sqrt(1/8)
 
     for row in range(1, 8):
         for col in range(8):
-            dct_matrix[row][col] = 0.5 * np.cos((2*col + 1) * row * np.pi / 16)
+            dctMatrix[row][col] = 0.5 * np.cos((2*col + 1) * row * np.pi / 16)
     
     for test_idx in range(1):
         
@@ -45,7 +45,7 @@ def main():
         
         for model_idx in range(3):
             dct_coefficients[:, :, model_idx] = dct(dct(original_matrix[:,:,model_idx].T, norm='ortho').T, norm='ortho')
-            # dct_coefficients[:, :, model_idx] = np.matmul(np.matmul(dct_matrix, original_matrix[:, :, model_idx]), dct_matrix.T)
+            # dct_coefficients[:, :, model_idx] = np.matmul(np.matmul(dctMatrix, original_matrix[:, :, model_idx]), dctMatrix.T)
         
         print_to_file(dct_coefficients, BASE_TESTING_FOLDER + "correct_image_values/test_" + str(test_idx) + "_correct.txt")
         

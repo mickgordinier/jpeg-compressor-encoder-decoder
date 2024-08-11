@@ -5,17 +5,17 @@
 #include <cstdint>
 
 // RGB are 8-bit unsigned values when read
-struct RGB_Val
+struct RgbVal
 {
-  uint8_t r, g, b;
+  std::uint8_t r, g, b;
 };
 
-struct YCbCr_Val
+struct YCbCrVal
 {
   double y, cb, cr;
 };
 
-typedef std::vector<std::vector<RGB_Val>> RgbImgMatrix;
-typedef std::vector<std::vector<YCbCr_Val>> YCbCrImgMatrix;
+typedef std::vector<std::vector<RgbVal>> RgbImgMatrix;
+typedef std::vector<std::vector<YCbCrVal>> YCbCrImgMatrix;
 
 #endif // COMMON_TYPES_H
