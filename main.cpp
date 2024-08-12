@@ -17,8 +17,36 @@ int main(int argc, char *argv[])
   BitmapDecoder bitmap(filename);
 
   #ifdef MAIN_DEBUG
-    std::cout << "Original RGB Image" << std::endl;
-    bitmap.printRgbMatrix();
+    std::cout << "ORIGINAL RGB MATRIX" << std::endl;
+    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
+    {
+      for (std::uint32_t colIdx = 0; colIdx < 8; ++colIdx)
+      {
+        std::cout << unsigned(bitmap.rgbImgMatrix[rowIdx][colIdx].r) << " ";
+      }
+      std::cout << std::endl;
+    }
+    std::cout << std::endl;
+
+    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
+    {
+      for (std::uint32_t colIdx = 0; colIdx < 8; ++colIdx)
+      {
+        std::cout << unsigned(bitmap.rgbImgMatrix[rowIdx][colIdx].g) << " ";
+      }
+      std::cout << std::endl;
+    }
+    std::cout << std::endl;
+
+    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
+    {
+      for (std::uint32_t colIdx = 0; colIdx < 8; ++colIdx)
+      {
+        std::cout << unsigned(bitmap.rgbImgMatrix[rowIdx][colIdx].b) << " ";
+      }
+      std::cout << std::endl;
+    }
+    std::cout << std::endl;
   #endif
 
   // Ensuring Bitmap Conversion works
@@ -59,7 +87,7 @@ int main(int argc, char *argv[])
       }
       std::cout << std::endl;
     }
-    std::cout << std::endl
+    std::cout << std::endl;
   #endif
 
   // Ensuring YCbCr Conversion works
@@ -255,8 +283,7 @@ int main(int argc, char *argv[])
       }
       std::cout << std::endl;
     }
-    std::cout << std::endl
-              << std::endl;
+    std::cout << std::endl;
   #endif
 
   bitmap.createOutputFile("testOut4.bmp", convertedBack3);
