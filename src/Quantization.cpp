@@ -11,18 +11,59 @@
  * source image.
  */
 
+// https://www.cl.cam.ac.uk/teaching/1011/R08/jpeg/acs10-jpeg.pdf
+// https://www.sciencedirect.com/topics/engineering/quantization-table
+// https://www.sciencedirect.com/science/article/pii/S1742287608000285
+
 // Removing high frequencies present in original image --> Losing high detail for smaller file size
 void quantization(
   YCbCrImgMatrix &dctImage,
-  uint8_t image_quality)
+  uint8_t qualityFactor)
 {
+  double scalingFactor = 0;
+  if (qualityFactor < 50) {
+    scalingFactor = 5000 / qualityFactor;
+  } else {
+    scalingFactor = 200 - (2 * qualityFactor);
+  }
+  std::cout << "Scaling Factor: " << scalingFactor << std::endl;
+
   for (std::uint32_t rowIdx = 0; rowIdx < dctImage.size(); ++rowIdx)
   {
     for (std::uint32_t colIdx = 0; colIdx < dctImage[0].size(); ++colIdx)
     {
-      dctImage[rowIdx][colIdx].y = std::round(dctImage[rowIdx][colIdx].y / LUMINANCE_QUANTIZATION_MATRIX[rowIdx % 8][colIdx % 8]);
-      dctImage[rowIdx][colIdx].cb = std::round(dctImage[rowIdx][colIdx].cb / CHROMA_QUANTIZATION_MATRIX[rowIdx % 8][colIdx % 8]);
-      dctImage[rowIdx][colIdx].cr = std::round(dctImage[rowIdx][colIdx].cr / CHROMA_QUANTIZATION_MATRIX[rowIdx % 8][colIdx % 8]);
+      double qLumanice = ((scalingFactor * LUMINANCE_QUANTIZATION_MATRIX[rowIdx % 8][colIdx % 8]) + 50) / 100;
+      double qChroma = ((scalingFactor * CHROMA_QUANTIZATION_MATRIX[rowIdx % 8][colIdx % 8]) + 50) / 100;
+
+      dctImage[rowIdx][colIdx].y = std::round(dctImage[rowIdx][colIdx].y / qLumanice);
+      dctImage[rowIdx][colIdx].cb = std::round(dctImage[rowIdx][colIdx].cb / qChroma);
+      dctImage[rowIdx][colIdx].cr = std::round(dctImage[rowIdx][colIdx].cr / qChroma);
+    }
+  }
+}
+
+
+void decompressImage(
+  YCbCrImgMatrix &dctImage,
+  uint8_t qualityFactor)
+{
+  double scalingFactor = 0;
+  if (qualityFactor < 50) {
+    scalingFactor = 5000 / qualityFactor;
+  } else {
+    scalingFactor = 200 - (2 * qualityFactor);
+  }
+
+  for (std::uint32_t rowIdx = 0; rowIdx < dctImage.size(); ++rowIdx)
+  {
+    for (std::uint32_t colIdx = 0; colIdx < dctImage[0].size(); ++colIdx)
+    {
+      double qLumanice = ((scalingFactor * LUMINANCE_QUANTIZATION_MATRIX[rowIdx % 8][colIdx % 8]) + 50) / 100;
+      double qChroma = ((scalingFactor * CHROMA_QUANTIZATION_MATRIX[rowIdx % 8][colIdx % 8]) + 50) / 100;
+
+      dctImage[rowIdx][colIdx].y = dctImage[rowIdx][colIdx].y * qLumanice;
+      dctImage[rowIdx][colIdx].cb = dctImage[rowIdx][colIdx].cb * qChroma;
+      dctImage[rowIdx][colIdx].cr = dctImage[rowIdx][colIdx].cr * qChroma;
     }
   }
 }

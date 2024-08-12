@@ -8,7 +8,8 @@
 #include <array>
 #include <vector>
 #include <cmath>
-#include <math.h>
+#include <math.h> 
+#include <algorithm> 
 #include <cstdint>
 #include "CommonTypes.hpp"
 
@@ -86,6 +87,10 @@ void
 performDCT(
   YCbCrImgMatrix &imageToTransform);
 
+void 
+performIDCT(
+  YCbCrImgMatrix &imageToTransform);
+
 /* ################# DISCRETE COSINE TRANFORMATION END ################# */
 
 /* ################# QUANTIZATION BEGIN ################# */
@@ -113,6 +118,10 @@ const std::vector<std::vector<double>> CHROMA_QUANTIZATION_MATRIX = {
 void quantization(
   YCbCrImgMatrix &dctImage,
   uint8_t image_quality);
+
+void decompressImage(
+  YCbCrImgMatrix &dctImage,
+  uint8_t qualityFactor);
 
 /* ################# QUANTIZATION END ################# */
 
