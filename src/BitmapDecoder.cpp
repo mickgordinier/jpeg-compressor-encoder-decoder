@@ -202,11 +202,8 @@ BitmapDecoder::BitmapDecoder(
     bitmapDebugPrint("Y-resolution (Pixel per Meter)", yResolution);
     bitmapDebugPrint("Number of Colors", getWord(bmp_file));
   #else
-    // ignore next 4 bytes (Image size in bytes)
-    // ignore next 4 bytes (horizontal resolution in pixel/meter)
-    // ignore next 4 bytes (vertical resolution in pixel/meter)
     // ignore next 4 bytes (colors used either 0 or 2^n)
-    skipBytes(bmp_file, 16);
+    skipBytes(bmp_file, 4);
   #endif
 
   uint32_t numImportantColors = getWord(bmp_file);

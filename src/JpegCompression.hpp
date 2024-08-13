@@ -115,14 +115,27 @@ const std::vector<std::vector<double>> CHROMA_QUANTIZATION_MATRIX = {
   {99, 99, 99, 99, 99, 99, 99, 99},
   {99, 99, 99, 99, 99, 99, 99, 99}};
 
-void quantization(
+void 
+quantization(
   YCbCrImgMatrix &dctImage,
   uint8_t image_quality);
 
-void decompressImage(
+void 
+decompressImage(
   YCbCrImgMatrix &dctImage,
   uint8_t qualityFactor);
 
 /* ################# QUANTIZATION END ################# */
+
+/* ################# ENCODING BEGIN ################# */
+
+std::string
+getRunLengthEncoding(
+  YCbCrImgMatrix &compressedDctMatrix,
+  std::uint32_t rowOffset,
+  std::uint32_t colOffset,
+  int previousDcCoefficient);
+
+/* ################# ENCODING END ################# */
 
 #endif

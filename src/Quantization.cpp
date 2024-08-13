@@ -26,7 +26,6 @@ void quantization(
   } else {
     scalingFactor = 200 - (2 * qualityFactor);
   }
-  std::cout << "Scaling Factor: " << scalingFactor << std::endl;
 
   for (std::uint32_t rowIdx = 0; rowIdx < dctImage.size(); ++rowIdx)
   {

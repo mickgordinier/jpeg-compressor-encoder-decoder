@@ -198,15 +198,18 @@ convertPaddedYCbCrtoRgb(
       double cb = yCbCrMatrix[rowIdx][colIdx].cb;
       double cr = yCbCrMatrix[rowIdx][colIdx].cr;
 
+      double computedR = std::round(y + (1.402 * (cr - 128)));
+      double computedG = std::round(y + (-0.34414 * (cb - 128)) + (-0.71414 * (cr - 128)));
+      double computedB = std::round(y + (1.772 * (cb - 128)));
+
       RgbVal rgbVal = {0, 0, 0};
-      rgbVal.r = static_cast<std::uint8_t>(std::max(static_cast<double>(0), std::round(y + (1.402 * (cr - 128)))));
-      rgbVal.g = static_cast<std::uint8_t>(std::max(static_cast<double>(0), std::round(y + (-0.34414 * (cb - 128)) + (-0.71414 * (cr - 128)))));
-      rgbVal.b = static_cast<std::uint8_t>(std::max(static_cast<double>(0), std::round(y + (1.772 * (cb - 128)))));
+      rgbVal.r = static_cast<std::uint8_t>(std::min(std::max(static_cast<double>(0), computedR), static_cast<double>(255)));
+      rgbVal.g = static_cast<std::uint8_t>(std::min(std::max(static_cast<double>(0), computedG), static_cast<double>(255)));
+      rgbVal.b = static_cast<std::uint8_t>(std::min(std::max(static_cast<double>(0), computedB), static_cast<double>(255)));
 
       rgbMatrix[rowIdx][colIdx] = rgbVal;
     }
   }
-  std::cout << std::endl;
 
   return rgbMatrix;
 }
