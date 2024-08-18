@@ -12,22 +12,19 @@ SHARED_HEADERS = $(SRC_DIR)/CommonTypes.hpp $(SRC_DIR)/JpegCompression.hpp
 
 ############# BITMAP AND TESTING #############
 
-
 BITMAP_DECODER_SRC = $(SRC_DIR)/BitmapDecoder.cpp
 BITMAP_DECODER_OBJECT = $(BIN_DIR)/BitmapDecoder.o
 
-BITMAP_TEST_DIR = $(TEST_DIR)/bitmap_testing
+BITMAP_TEST_DIR = $(TEST_DIR)/bitmapTesting
 BITMAP_TEST_SRC = $(BITMAP_TEST_DIR)/BitmapTester.cpp
 BITMAP_TEST_OBJECT = $(BIN_DIR)/BitmapTester.o
 
 # Exetuable path for bitmap testing
-BITMAP_TEST_TARGET = ./$(BIN_DIR)/bitmap_test  
+BITMAP_TEST_TARGET = $(BIN_DIR)/bitmapTest  
 
 # Target that creates and run bitmap testing
-bitmap_test: $(BITMAP_TEST_TARGET)
-	cd $(BIN_DIR)
+bitmapTest: $(BITMAP_TEST_TARGET)
 	./$(BITMAP_TEST_TARGET)
-	cd ..
 
 # Creating Bitmap Source Object file
 $(BITMAP_DECODER_OBJECT): $(BITMAP_DECODER_SRC) $(SHARED_HEADERS)
@@ -43,17 +40,36 @@ $(BITMAP_TEST_TARGET): $(BITMAP_DECODER_OBJECT) $(BITMAP_TEST_OBJECT)
 
 ##############################################
 
-Discrete_Cosine_Transformation.o: Discrete_Cosine_Transformation.cpp Discrete_Cosine_Transformation.hpp
-	g++ -c Discrete_Cosine_Transformation.cpp
 
-DCT_Tester.o: testing/dct_testing/DCT_Tester.cpp
-	g++ -c testing/dct_testing/DCT_Tester.cpp
+############### DCT AND TESTING ##############
 
-# Creates performs testing for Bitmap images
-dct_test: Discrete_Cosine_Transformation.o DCT_Tester.o
-	g++ -o dct_test Discrete_Cosine_Transformation.o DCT_Tester.o
-	./dct_test
+DCT_SRC = $(SRC_DIR)/DiscreteCosineTransformation.cpp
+DCT_OBJECT = $(BIN_DIR)/DCT.o
 
-.PHONY: clean debug
+DCT_TEST_DIR = $(TEST_DIR)/dctTesting
+DCT_TEST_SRC = $(DCT_TEST_DIR)/DctTester.cpp
+DCT_TEST_OBJECT = $(BIN_DIR)/DctTester.o
+
+# Exetuable path for dct testing
+DCT_TEST_TARGET = $(BIN_DIR)/dctTest 
+
+# Target that creates and run DCT testing
+dctTest: $(DCT_TEST_TARGET)
+	./$(DCT_TEST_TARGET)
+
+$(DCT_OBJECT): $(DCT_SRC) $(SHARED_HEADERS)
+	$(CXX) $(CXXFLAGS) -o $(DCT_OBJECT) -c $(DCT_SRC)
+
+$(DCT_TEST_OBJECT): $(DCT_TEST_SRC)
+	$(CXX) $(CXXFLAGS) -o $(DCT_TEST_OBJECT) -c $(DCT_TEST_SRC)
+
+# Creates executable for bitmap testing at $(DCT_TEST_TARGET)
+$(DCT_TEST_TARGET): $(DCT_OBJECT) $(DCT_TEST_OBJECT)
+	$(CXX) $(CXXFLAGS) -o $(DCT_TEST_TARGET) $(DCT_OBJECT) $(DCT_TEST_OBJECT)
+
+##############################################
+
 clean:
-	rm -f *.o $(BIN_DIR)/*.o $(BIN_DIR)/*_test 
+	rm -f $(BIN_DIR)/*
+
+.PHONY: clean bitmapTest dctTest
