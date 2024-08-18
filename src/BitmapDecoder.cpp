@@ -81,6 +81,11 @@ BitmapDecoder::BitmapDecoder(
   // setting i/o stream base mode to binary
   std::ifstream bmp_file(filename, std::ios_base::binary);
 
+  if (!bmp_file) {
+    std::cout << "ERROR: File stream (" << filename << ") not able to be opened" << std::endl;
+    exit(-1);
+  }
+
   // READING IN BITMAP HEADER AND INFOHEADER
   /* NOTE: There exist different infoheader versions (~8 different versions).
   *        We will be condensing all future Bitmap versions into the version
