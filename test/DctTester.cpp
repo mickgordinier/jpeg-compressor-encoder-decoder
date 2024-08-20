@@ -1,4 +1,4 @@
-#include "../../src/JpegCompression.hpp"
+#include "../src/JpegCompression.hpp"
 #include <iostream>
 #include <fstream>
 #include <cassert>
