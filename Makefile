@@ -15,6 +15,7 @@ endif
 SRC_DIR = src
 OBJ_DIR = obj
 BIN_DIR = bin
+OUT_DIR = output
 TEST_DIR = test
 
 SHARED_HEADERS = $(SRC_DIR)/CommonTypes.hpp $(SRC_DIR)/JpegCompression.hpp
@@ -95,6 +96,6 @@ $(COMPRESSED_BITMAP_TARGET): $(COMPRESSED_BITMAP_OBJS)
 ##############################################
 
 clean:
-	rm -f $(BIN_DIR)/* $(OBJ_DIR)/*
+	rm -f $(BIN_DIR)/* $(OBJ_DIR)/* $(OUT_DIR)/*
 
 .PHONY: clean all bitmapTest dctTest compressedBitmap 

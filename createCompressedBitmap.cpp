@@ -6,6 +6,87 @@
 *              ./compressBitmap <BMP_IMAGE>.bmp <compress quality>
 */
 
+void
+printRgbImageSection(
+  RgbImgMatrix &rgbImgMatrix,
+  std::uint32_t rowStart,
+  std::uint32_t colStart)
+{
+  // Prints 8x8 Red Channel
+  for (std::uint32_t rowIdx = rowStart; rowIdx < rowStart+8; ++rowIdx)
+  {
+    for (std::uint32_t colIdx = colStart; colIdx < colStart+8; ++colIdx)
+    {
+      std::cout << unsigned(rgbImgMatrix[rowIdx][colIdx].r) << " ";
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
+
+  // Prints 8x8 Blue Channel
+  for (std::uint32_t rowIdx = rowStart; rowIdx < rowStart+8; ++rowIdx)
+  {
+    for (std::uint32_t colIdx = colStart; colIdx < colStart+8; ++colIdx)
+    {
+      std::cout << unsigned(rgbImgMatrix[rowIdx][colIdx].g) << " ";
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
+
+  // Prints 8x8 Green Channel
+  for (std::uint32_t rowIdx = rowStart; rowIdx < rowStart+8; ++rowIdx)
+  {
+    for (std::uint32_t colIdx = colStart; colIdx < colStart+8; ++colIdx)
+    {
+      std::cout << unsigned(rgbImgMatrix[rowIdx][colIdx].b) << " ";
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
+
+  return;
+}
+
+void
+printYCbCrImageSection(
+  YCbCrImgMatrix &yCbCrImgMatrix,
+  std::uint32_t rowStart,
+  std::uint32_t colStart)
+{
+  for (std::uint32_t rowIdx = rowStart; rowIdx < rowStart+8; ++rowIdx)
+    {
+      for (std::uint32_t colIdx = colStart; colIdx < colStart+8; ++colIdx)
+      {
+        std::cout << yCbCrImgMatrix[rowIdx][colIdx].y << " ";
+      }
+      std::cout << std::endl;
+    }
+    std::cout << std::endl;
+
+    for (std::uint32_t rowIdx = rowStart; rowIdx < rowStart+8; ++rowIdx)
+    {
+      for (std::uint32_t colIdx = colStart; colIdx < colStart+8; ++colIdx)
+      {
+        std::cout << yCbCrImgMatrix[rowIdx][colIdx].cb << " ";
+      }
+      std::cout << std::endl;
+    }
+    std::cout << std::endl;
+
+    for (std::uint32_t rowIdx = rowStart; rowIdx < rowStart+8; ++rowIdx)
+    {
+      for (std::uint32_t colIdx = colStart; colIdx < colStart+8; ++colIdx)
+      {
+        std::cout << yCbCrImgMatrix[rowIdx][colIdx].cr << " ";
+      }
+      std::cout << std::endl;
+    }
+    std::cout << std::endl;
+
+    return;
+}
+
 int main(int argc, char *argv[])
 {
   /* Performing JPEG Compression and Encoding */
@@ -24,35 +105,7 @@ int main(int argc, char *argv[])
 
   #ifdef MAIN_DEBUG
     std::cout << "ORIGINAL RGB MATRIX" << std::endl;
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << unsigned(bitmap.rgbImgMatrix[rowIdx][colIdx].r) << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << unsigned(bitmap.rgbImgMatrix[rowIdx][colIdx].g) << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << unsigned(bitmap.rgbImgMatrix[rowIdx][colIdx].b) << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
+    printRgbImageSection(bitmap.rgbImgMatrix, 0, 0);
   #endif
 
   // Step 2: Convert RGB matrix to yCbCr Matrix to extract luminance channel from chroma/color channels
@@ -62,35 +115,7 @@ int main(int argc, char *argv[])
 
   #ifdef MAIN_DEBUG
     std::cout << "Converted RGB to YCbCr" << std::endl;
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << convertedImage[rowIdx][colIdx].y << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << convertedImage[rowIdx][colIdx].cb << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << convertedImage[rowIdx][colIdx].cr << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
+    printYCbCrImageSection(convertedImage, 0, 0);
   #endif
 
   // Step 3: Downsampling Chroma Components TBD
@@ -104,35 +129,7 @@ int main(int argc, char *argv[])
 
   #ifdef MAIN_DEBUG
     std::cout << "DCT of Image" << std::endl;
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << convertedImage[rowIdx][colIdx].y << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << convertedImage[rowIdx][colIdx].cb << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << convertedImage[rowIdx][colIdx].cr << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
+    printYCbCrImageSection(convertedImage, 0, 0);
   #endif
 
   // Step 5: Quantization
@@ -143,35 +140,7 @@ int main(int argc, char *argv[])
 
   #ifdef MAIN_DEBUG
     std::cout << "DCT Quantized of Image" << std::endl;
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << convertedImage[rowIdx][colIdx].y << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << convertedImage[rowIdx][colIdx].cb << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << convertedImage[rowIdx][colIdx].cr << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
+    printYCbCrImageSection(convertedImage, 0, 0);
   #endif
 
   // Step 6: Decompression / Dequantization
@@ -179,35 +148,7 @@ int main(int argc, char *argv[])
 
   #ifdef MAIN_DEBUG
     std::cout << "Decompressed DCT of Image" << std::endl;
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << convertedImage[rowIdx][colIdx].y << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << convertedImage[rowIdx][colIdx].cb << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << convertedImage[rowIdx][colIdx].cr << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
+    printYCbCrImageSection(convertedImage, 0, 0);
   #endif
 
   // Step 6: Performing Inverse Discrete Cosine Transformation
@@ -216,35 +157,7 @@ int main(int argc, char *argv[])
 
   #ifdef MAIN_DEBUG
     std::cout << "IDCT of Decompressed Image" << std::endl;
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << convertedImage[rowIdx][colIdx].y << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << convertedImage[rowIdx][colIdx].cb << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << convertedImage[rowIdx][colIdx].cr << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
+    printYCbCrImageSection(convertedImage, 0, 0);
   #endif
 
 
@@ -252,38 +165,10 @@ int main(int argc, char *argv[])
 
   #ifdef MAIN_DEBUG
     std::cout << "NEW RGB MATRIX" << std::endl;
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << unsigned(compressedRgbImage[rowIdx][colIdx].r) << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << unsigned(compressedRgbImage[rowIdx][colIdx].g) << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
-    for (std::uint32_t rowIdx = 0; rowIdx < 8; ++rowIdx)
-    {
-      for (std::uint32_t colIdx = bitmap.width-8; colIdx < bitmap.width; ++colIdx)
-      {
-        std::cout << unsigned(compressedRgbImage[rowIdx][colIdx].b) << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
+    printRgbImageSection(bitmap.rgbImgMatrix, 0, 0);
   #endif
 
-  bitmap.createOutputFile("compressedImage.bmp", compressedRgbImage);
+  bitmap.createOutputFile("../output/compressedImage.bmp", compressedRgbImage);
 
   return 0;
 }

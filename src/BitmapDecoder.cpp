@@ -345,12 +345,12 @@ BitmapDecoder::printRgbMatrix(
 
 static void
 putNBytes(
-  std::ofstream &outFile,
+  std::ofstream &outFileStream,
   std::uint32_t numberToWrite,
   std::uint8_t numBytes)
 {
   for (uint8_t byteIdx = 0; byteIdx < numBytes; ++byteIdx) {
-    outFile.put(numberToWrite & 0xFF);
+    outFileStream.put(numberToWrite & 0xFF);
     numberToWrite >>= 8;
   }
 }
@@ -360,31 +360,36 @@ BitmapDecoder::createOutputFile(
   std::string outFilename,
   RgbImgMatrix &newImageMatrix)
 {
-  std::ofstream outFile(outFilename, std::ios_base::binary);
+  std::ofstream outFileStream(outFilename, std::ios_base::binary);
 
-  outFile << HEADER_SIGNATURE;
+  if (!outFileStream) {
+    std::cout << "ERROR cannot open output file stream" << std::endl;
+    exit(-1);
+  }
 
-  putNBytes(outFile, fileSizeBytes, 4);
-  putNBytes(outFile, reservedBytes, 4);
-  putNBytes(outFile, OFFSET_TO_PIXEL_DATA, 4);
+  outFileStream << HEADER_SIGNATURE;
 
-  putNBytes(outFile, INFOHEADER_SIZE, 4);
-  putNBytes(outFile, width, 4);
-  putNBytes(outFile, height, 4);
-  putNBytes(outFile, NUM_COLOR_PLANES, 2);
-  putNBytes(outFile, BITS_PER_PIXELS, 2);
-  putNBytes(outFile, COMPRESSION_TYPE, 4);
-  putNBytes(outFile, imageSize, 4);
-  putNBytes(outFile, xResolution, 4);
-  putNBytes(outFile, yResolution, 4);
-  putNBytes(outFile, NUM_COLORS, 4);
-  putNBytes(outFile, NUM_IMPORTANT_COLORS, 4);
+  putNBytes(outFileStream, fileSizeBytes, 4);
+  putNBytes(outFileStream, reservedBytes, 4);
+  putNBytes(outFileStream, OFFSET_TO_PIXEL_DATA, 4);
+
+  putNBytes(outFileStream, INFOHEADER_SIZE, 4);
+  putNBytes(outFileStream, width, 4);
+  putNBytes(outFileStream, height, 4);
+  putNBytes(outFileStream, NUM_COLOR_PLANES, 2);
+  putNBytes(outFileStream, BITS_PER_PIXELS, 2);
+  putNBytes(outFileStream, COMPRESSION_TYPE, 4);
+  putNBytes(outFileStream, imageSize, 4);
+  putNBytes(outFileStream, xResolution, 4);
+  putNBytes(outFileStream, yResolution, 4);
+  putNBytes(outFileStream, NUM_COLORS, 4);
+  putNBytes(outFileStream, NUM_IMPORTANT_COLORS, 4);
 
   for (std::uint32_t rowIdx = height; rowIdx > 0; --rowIdx) {
     for (std::uint32_t colIdx = 0; colIdx < width; ++colIdx) {
-      outFile.put(newImageMatrix[rowIdx-1][colIdx].b);
-      outFile.put(newImageMatrix[rowIdx-1][colIdx].g);
-      outFile.put(newImageMatrix[rowIdx-1][colIdx].r);
+      outFileStream.put(newImageMatrix[rowIdx-1][colIdx].b);
+      outFileStream.put(newImageMatrix[rowIdx-1][colIdx].g);
+      outFileStream.put(newImageMatrix[rowIdx-1][colIdx].r);
     }
   }
 }
